@@ -35,14 +35,15 @@
       "title": "Junior Full Stack Software Engineer",
       "org": "Bemmel & Kroon",
       "where": "Zoeterwoude-Rijndijk",
-      "desc": "Web apps and internal tools, front end and back end: turning what the company needs into practical software and automating how work gets done. Includes the staff scheduling app I started in 2025."
+      "desc": "Web apps and internal tools, front end and back end: turning what the company needs into practical software and automating how work gets done. Includes the staff scheduling app I started in 2025. I grew into this role from customer service and sales at the same company."
     },
     {
       "when": "02/2026 – 07/2026",
       "title": "Software Engineering intern",
       "org": "Genba Studio",
       "where": "Leiden",
-      "desc": "An AI-driven content platform for a Dutch hospitality publisher: OpenAI assistants with a human check, cutting content from about a week to one or two days at around 90% accuracy. Front end, back end and design."
+      "desc": "An AI-driven content platform for a Dutch hospitality publisher: OpenAI assistants with a human check, cutting content from about a week to one or two days at around 90% accuracy. Front end, back end and design.",
+      "type": "internship"
     },
     {
       "when": "01/2026 – present",
@@ -51,27 +52,6 @@
       "where": "Netherlands",
       "url": "https://arcnode.dev",
       "desc": "My studio for my own software and client work: desktop apps, a game and its launcher, community platforms and Backboard, the sign-in service behind all of them."
-    },
-    {
-      "when": "09/2024 – 06/2026",
-      "title": "Customer service and inside sales",
-      "org": "Bemmel & Kroon",
-      "where": "Zoeterwoude-Rijndijk",
-      "desc": "First point of contact for customers, appliance sales and advice, orders, service requests and complaints. Where I grew into building software."
-    },
-    {
-      "when": "09/2023 – 09/2024",
-      "title": "Bike courier",
-      "org": "Thuisbezorgd",
-      "where": "Leiden",
-      "desc": "Meals to the door, by bike, in every kind of Dutch weather."
-    },
-    {
-      "when": "01/2018 – 07/2022",
-      "title": "Hospitality and retail",
-      "org": "Van der Valk, Grand Café Hofplein, Blokker and more",
-      "where": "Leiden area",
-      "desc": "Serving, bar work, kitchen prep, the till and stocking shelves: where I learned how much good contact with people matters."
     }
   ],
   "projects": [
@@ -364,12 +344,6 @@
     {
       "when": "08/2023 – 08/2026",
       "title": "Software Developer, accelerated track",
-      "org": "mboRijnland",
-      "where": "Leiden"
-    },
-    {
-      "when": "08/2020 – 07/2023",
-      "title": "Hospitality Manager and Entrepreneur",
       "org": "mboRijnland",
       "where": "Leiden"
     }
