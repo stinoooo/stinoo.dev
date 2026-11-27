@@ -168,9 +168,9 @@ ${head}
     <h2>About me</h2>
     <p>At Bemmel &amp; Kroon I grew from customer service and sales into building their software, and I'm studying Software Engineering next to that. I'm early in my career and learning all the time: by doing, by asking questions and by working with others.</p>
     <p>Outside work and school I mountain bike, play drums and there is pretty much always music on. I game, and I'm part of a few online gaming communities, which is how most of my client work started: websites and Discord bots for the communities I play in.</p>
-    <p>And this is Banjer, head of quality assurance. Most of my bugs get solved on his walks.</p>
+    <p>And this is Banjer, my lovely labradoodle and head of quality assurance. Most of my bugs get solved on his walks.</p>
   </div>
-  <img src="/site/shots/banjer.webp" alt="Banjer, a curly brown dog in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" width="560" height="746" loading="lazy" decoding="async">
+  <img src="/site/shots/banjer.webp" alt="Banjer, a curly brown labradoodle in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" width="560" height="746" loading="lazy" decoding="async">
 </section>
 
 <section id="contact" class="contact">
