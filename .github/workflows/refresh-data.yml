@@ -1,0 +1,51 @@
+# Refreshes the GitHub numbers on the site every morning (contributions, the code wall, stars)
+# and commits them to development when they changed. Vercel deploys development as a preview;
+# the numbers reach stinoo.dev with the next release into main.
+#
+# Language shares count my private repositories too, which needs a token of mine:
+#   gh secret set STATS_TOKEN --repo stinoooo/stinoo.dev
+# (a fine-grained token with read access to metadata of all my repositories). Without it the
+# shares from the last full run are kept.
+name: Refresh data
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: development
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fetch from GitHub
+        env:
+          GH_TOKEN: ${{ secrets.STATS_TOKEN || secrets.GITHUB_TOKEN }}
+        run: node scripts/build-data.mjs --fetch-github
+      - name: Check the build
+        run: npm ci && node scripts/build.mjs
+      - name: Commit when something changed
+        run: |
+          git add github-snapshot.json wall.json wall.txt themes.json site/*.json site/assets/themes
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          git config user.name "stinoooo"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+          git commit -m "chore(data): refresh GitHub numbers" -m "Affects:
+          - github-snapshot.json
+          - site/"
+          git push
