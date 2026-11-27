@@ -33,6 +33,10 @@ Engineering student from Leiden. This site shows what I make, mostly under
   both), screenshots as WebP. Scripts have content hashes in their names and are cached for a year.
 - **A visitor counter without cookies.** The graph in the bottom bar comes from a tiny service on
   Railway ([`counter/`](counter/)). It stores counts per hour and nothing about a visitor.
+  Load times come from Vercel Speed Insights on its free tier, also without cookies.
+- **Case studies.** The five headline projects each have a short one (the problem, what I built,
+  the result) under `case` in the config. The editor shows it as `CASE-STUDY.md`, the simple
+  version under each project.
 
 ## Run it
 
@@ -59,6 +63,7 @@ python serve.py 8768 dist
 | Text, projects, work, internships (`"type": "internship"`), school, achievements, links | `portfolio.config.json` | `node scripts/build-data.mjs` |
 | GitHub numbers and the code on the wall | nothing | `node scripts/build-data.mjs --fetch-github` (needs `gh`, signed in as me) |
 | Project screenshots | the list in `scripts/shots.mjs` | `node scripts/shots.mjs` |
+| A video on a project, like the Exit Only trailer | a `{ "film", "poster", "duration", "name", "alt" }` entry in that project's `shots` | `node scripts/build-data.mjs` |
 | The facts beside the portrait | `FACTS` in `site/portrait.js` | nothing |
 | The simple page | `scripts/simple.mjs`, `simple/simple.css` | `node scripts/build.mjs` |
 | Sounds | `intros/shared/sfx.js` | nothing |
