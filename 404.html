@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found · stinoo.dev</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+@font-face { font-family: "Plex Mono"; src: url("/assets/fonts/plex-mono.woff2") format("woff2"); font-display: swap; }
+:root { --bg: #0b0b0a; --ink: #ebe6db; --dim: #7a766a; --accent: #e7c58a; --kw: #7fd1a0; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { display: grid; place-items: center; padding: 24px 16px; background: var(--bg); color: var(--ink); font: 400 14px/1.7 "Plex Mono", ui-monospace, monospace; }
+main { width: min(560px, 100%); }
+.dim { color: var(--dim); }
+.user { color: var(--kw); }
+.err { color: #f0885b; }
+a { color: var(--accent); }
+.cursor { display: inline-block; width: 0.6em; height: 1.1em; vertical-align: -0.2em; background: var(--accent); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+ul { margin: 8px 0 0; padding: 0; list-style: none; }
+li::before { content: "› "; color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <p><span class="user">stijn</span><span class="dim">@dev ~</span><br>› cd <span id="path">this-page</span></p>
+  <p class="err">E484: Can't open file. There is nothing at this address.</p>
+  <p class="dim">Maybe one of these:</p>
+  <ul>
+    <li><a href="/">stinoo.dev</a> <span class="dim">the intro</span></li>
+    <li><a href="/site/">stinoo.dev/site</a> <span class="dim">projects, work and stack</span></li>
+    <li><a href="/simple/">stinoo.dev/simple</a> <span class="dim">the same, as a plain page</span></li>
+  </ul>
+  <p>› <span class="cursor"></span></p>
+</main>
+<script>
+  document.getElementById("path").textContent = decodeURIComponent(location.pathname).slice(0, 60) || "/";
+</script>
+</body>
+</html>
