@@ -1,33 +1,17 @@
 @font-face {
   font-family: "Archivo";
-  src: url("/assets/fonts/archivo.ttf") format("truetype");
-  font-weight: 100 900;
-  font-stretch: 62% 125%;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Instrument Serif";
-  src: url("/assets/fonts/InstrumentSerif-Regular.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Instrument Serif";
-  src: url("/intros/shared/InstrumentSerif-Italic.ttf") format("truetype");
-  font-style: italic;
-  font-weight: 400;
+  src: url("/assets/fonts/archivo.woff2") format("woff2");
+  font-weight: 400 700;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Plex Mono";
-  src: url("/assets/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+  src: url("/assets/fonts/plex-mono.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
+
 
 *,
 *::before,
@@ -106,10 +90,22 @@ button {
 
 .switch {
   display: flex;
-  gap: 2px;
+  align-items: center;
+  gap: 0 18px;
 }
 
-.switch a {
+@media (max-width: 560px) {
+  .switch {
+    gap: 0 12px;
+  }
+
+  .switch a[rel="me"] {
+    display: none;
+  }
+}
+
+.switch a,
+.switch button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -121,8 +117,21 @@ button {
   text-decoration: none;
 }
 
-.switch a:hover {
+.switch a:hover,
+.switch button:hover {
   color: var(--ink);
+}
+
+.switch button {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.switch button[aria-pressed="false"] {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
 }
 
 .switch a[aria-current="page"] {

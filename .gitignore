@@ -1,5 +1,13 @@
-.DS_Store
-.venv/
 node_modules/
+dist/
+.vercel/
+.build-glimpse.js
+counter/data/
+face-src*.mp4
+face-src*-still.png
 __pycache__/
 *.pyc
+.venv/
+.DS_Store
+.env
+.env.*
