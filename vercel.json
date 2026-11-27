@@ -6,11 +6,26 @@
   "trailingSlash": true,
   "rewrites": [
     {
+      "source": "/api/seen/",
+      "destination": "https://seen-production-e3a28cff.up.railway.app/api/seen"
+    },
+    {
       "source": "/api/seen",
       "destination": "https://seen-production-e3a28cff.up.railway.app/api/seen"
     }
   ],
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.stinoo.dev"
+        }
+      ],
+      "destination": "https://stinoo.dev/:path*",
+      "permanent": true
+    },
     {
       "source": "/simple",
       "destination": "/simple/",
