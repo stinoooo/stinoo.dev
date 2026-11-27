@@ -12,6 +12,7 @@ const ICON = {
   mail: '<path d="M2 4h20a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm1 2.4V18h18V6.4l-9 6.3-9-6.3ZM4.6 6l7.4 5.2L19.4 6H4.6Z"/>',
   globe: '<path d="M12 1a11 11 0 1 0 0 22 11 11 0 0 0 0-22Zm7.9 10h-3.4a17 17 0 0 0-1.4-6.6A9 9 0 0 1 19.9 11ZM12 3.1c1 1.3 2.2 4 2.4 7.9H9.6C9.8 7.1 11 4.4 12 3.1ZM8.9 4.4A17 17 0 0 0 7.5 11H4.1a9 9 0 0 1 4.8-6.6ZM4.1 13h3.4a17 17 0 0 0 1.4 6.6A9 9 0 0 1 4.1 13Zm7.9 7.9c-1-1.3-2.2-4-2.4-7.9h4.8c-.2 3.9-1.4 6.6-2.4 7.9Zm3.1-1.3a17 17 0 0 0 1.4-6.6h3.4a9 9 0 0 1-4.8 6.6Z"/>',
   terminal: '<path d="M3 4h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm1 2v12h16V6H4Zm2.3 2.3L10 12l-3.7 3.7-1.4-1.4L7.2 12 4.9 9.7l1.4-1.4ZM12 14h6v2h-6v-2Z"/>',
+  linkedin: '<path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/>',
   discord: '<path d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3l-.6 1.3a18.2 18.2 0 0 0-5.6 0L8.6 3a19.6 19.6 0 0 0-4.9 1.4C.6 9 0 13.6.3 18.1a19.8 19.8 0 0 0 6 3l1.3-2a12.8 12.8 0 0 1-2-1l.5-.4a14 14 0 0 0 11.8 0l.5.4c-.6.4-1.3.7-2 1l1.3 2a19.7 19.7 0 0 0 6-3c.4-5.3-.7-9.8-3.5-13.7ZM8.3 15.3c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm7.4 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/>',
 };
 const icon = (name) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[name]}</svg>`;
@@ -82,6 +83,7 @@ export function renderSimple({ config, content, snapshot, stack, head, styles })
   const github = config.links.find((l) => l.label === "GitHub");
   const x = config.links.find((l) => l.label === "X");
   const arcnode = config.links.find((l) => l.label === "Arcnode");
+  const linkedin = config.links.find((l) => l.label === "LinkedIn");
   const langs = (stack?.languages || []).slice(0, 6);
 
   return `<!doctype html>
@@ -177,6 +179,7 @@ ${head}
   <ul class="contact-list">
     ${email ? `<li><a href="${esc(email.url)}">${icon("mail")}<span><b>Email</b>${esc(bare(email.url))}</span></a></li>` : ""}
     ${github ? `<li><a href="${esc(github.url)}" rel="me">${icon("github")}<span><b>GitHub</b>${esc(bare(github.url))}</span></a></li>` : ""}
+    ${linkedin ? `<li><a href="${esc(linkedin.url)}" rel="me">${icon("linkedin")}<span><b>LinkedIn</b>${esc(bare(linkedin.url).replace(/^(www\.)?linkedin\.com\/in\//, ""))}</span></a></li>` : ""}
     ${x ? `<li><a href="${esc(x.url)}" rel="me">${icon("x")}<span><b>X</b>@s_tinoo</span></a></li>` : ""}
     <li><span class="static">${icon("discord")}<span><b>Discord</b>bossmannn</span></span></li>
     ${arcnode ? `<li><a href="${esc(arcnode.url)}">${icon("globe")}<span><b>Studio</b>arcnode.dev</span></a></li>` : ""}
