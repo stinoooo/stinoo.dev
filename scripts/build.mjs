@@ -16,7 +16,7 @@ const OUT = path.join(ROOT, "dist");
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, "portfolio.config.json"), "utf8"));
 const SITE = `https://${config.identity.domain}`;
 const NAME = config.identity.name;
-const DESCRIPTION = "Stijn Heemskerk: junior full stack engineer at Bemmel & Kroon and Software Engineering student from Leiden. Games, desktop apps and the web, under Arcnode.";
+const DESCRIPTION = "Stijn Heemskerk: junior full stack software engineer at Bemmel & Kroon and Software Engineering student from Leiden. Games, desktop apps and the web, under Arcnode.";
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 const hash = (data) => crypto.createHash("sha256").update(data).digest("hex").slice(0, 10);
@@ -107,7 +107,7 @@ function head({ title, description, path: page, preload = [] }) {
     `<meta property="og:image" content="${SITE}/og.png">`,
     `<meta property="og:image:width" content="1200">`,
     `<meta property="og:image:height" content="630">`,
-    `<meta property="og:image:alt" content="A terminal window made of my code: my name, Stijn Heemskerk, junior full stack engineer, Arcnode, and my profile picture in colored ASCII.">`,
+    `<meta property="og:image:alt" content="A terminal window made of my code: my name, Stijn Heemskerk, junior full stack software engineer, Arcnode, and my profile picture in colored ASCII.">`,
     `<meta property="profile:first_name" content="Stijn">`,
     `<meta property="profile:last_name" content="Heemskerk">`,
     `<meta name="twitter:card" content="summary_large_image">`,
@@ -183,7 +183,7 @@ write(
     stack: json("site/stack.json"),
     styles: await css(["simple/simple.css"]),
     head: head({
-      title: "Stijn Heemskerk · junior full stack engineer",
+      title: "Stijn Heemskerk · junior full stack software engineer",
       description: DESCRIPTION,
       path: "/simple/",
     }).replace(/<link rel="preload" href="\/assets\/fonts\/plex-mono.woff2"[^>]*>/, '<link rel="preload" href="/assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>'),

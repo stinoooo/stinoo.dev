@@ -61,7 +61,7 @@ function syncIdentity() {
     .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${domain} — a quiet wall of code. ${tagline}">`)
     .replace(/(<a class="brand"[^>]*>.*?<span>)[^<]*(<\/span><\/a>)/s, `$1${domain}$2`)
     .replace(/<a href="https:\/\/github\.com\/[^"]*" rel="me">github<\/a>/, `<a href="${ghUrl}" rel="me">github</a>`)
-    .replace(/<h1 class="sr-only">[^<]*<\/h1>/, `<h1 class="sr-only">${ID.name}, junior full stack engineer</h1>`)
+    .replace(/<h1 class="sr-only">[^<]*<\/h1>/, `<h1 class="sr-only">${ID.name}, junior full stack software engineer</h1>`)
     .replace(/<p class="note" aria-hidden="true">\/\/ [^<]*<\/p>/, `<p class="note" aria-hidden="true">// ${tagline}</p>`);
   write("index.html", idx);
 

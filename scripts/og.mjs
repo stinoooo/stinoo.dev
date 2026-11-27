@@ -91,7 +91,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" 
   <text x="72" y="150" font-size="20"><tspan fill="${GREEN}">stijn</tspan><tspan fill="${DIM}">@dev ~</tspan></text>
   <text x="72" y="182" font-size="20" fill="${INK}"><tspan fill="${ACCENT}">›</tspan> whoami</text>
   <text x="70" y="262" font-size="64" font-weight="700" fill="${INK}">Stijn Heemskerk</text>
-  <text x="72" y="312" font-size="25" fill="${INK}">junior full stack engineer</text>
+  <text x="72" y="312" font-size="25" fill="${INK}">junior full stack software engineer</text>
   <text x="72" y="346" font-size="25" fill="${INK}">software engineering student</text>
   <text x="72" y="396" font-size="20" fill="${GREEN}">// games, desktop apps and the web · Leiden</text>
   ${tagSvg}
