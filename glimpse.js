@@ -11,10 +11,15 @@ try {
 } catch {
   gate = gateNode;
 }
+// The intro itself waits for the card: it starts the moment a visitor does.
+let openIntro = () => {};
+const introOpen = new Promise((resolve) => (openIntro = resolve));
+if (!gate) openIntro();
 function closeGate(withSound) {
   if (!gate) return;
   const node = gate;
   gate = null;
+  openIntro();
   try {
     sessionStorage.setItem("stinoo.entered", "1");
   } catch {}
@@ -61,7 +66,7 @@ const TILE_ROWS = 13;
 const SEED_MS = 280;
 const FACE_HOLD_MS = 6000;
 const TEMPO = 0.5;
-const CYCLE = { first: [700, 1100], gap: [1000, 1000], pause: [1000, 1000], retry: 4000, restart: 7000, touchRestart: 3000 };
+const CYCLE = { first: [700, 1100], gap: [1000, 1000], pause: [1000, 1000], retry: 4000, restart: 7000, touchRestart: 3000, resume: 1600 };
 let INK = "235, 230, 219";
 let BG = "#050505";
 const GLYPHS = "░▒▓/\\<>+=*#%&@$0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -686,6 +691,7 @@ async function normalKeys(keys, alive) {
 }
 
 async function bootView() {
+  startRun();
   const token = ++boot.token;
   const alive = () => token === boot.token && Boolean(wall);
   if (prefersStill() || !wall?.panes.length) {
@@ -773,8 +779,11 @@ function renderWall() {
     const noteEnd = span[0] + 5 + NOTE_TEXT.length + 1;
     const enterStart = groupStart;
     noteRoom = enterStart - span[0] - 7;
+    // Too tight beside the buttons (phones): the line, and the intro's progress, sit one row higher at full width.
+    const tight = noteRoom < 24;
+    if (tight) noteRoom = span[1] - span[0] - 10;
     noteLine.style.left = `${cellX(span[0] + 5)}px`;
-    noteLine.style.top = `${(rows - 3) * CELL_H}px`;
+    noteLine.style.top = `${(rows - (tight ? 5 : 3)) * CELL_H}px`;
     noteLine.style.bottom = "auto";
     noteLine.style.visibility = noteEnd + 2 > enterStart ? "hidden" : "";
   }
@@ -1605,7 +1614,8 @@ function scheduleCycle(delay) {
 function stopCycle() {
   director.token++;
   if (tile) Object.assign(tile, { hold: false, dilate: false });
-  if (!leaving) scheduleCycle(touchMode ? CYCLE.touchRestart : CYCLE.restart);
+  if (!leaving && !run.finished) scheduleCycle(CYCLE.resume);
+  else if (!leaving) scheduleCycle(touchMode ? CYCLE.touchRestart : CYCLE.restart);
 }
 
 function calmNow() {
@@ -1650,50 +1660,141 @@ async function runCycle() {
   }
   const token = ++director.token;
   const alive = () => token === director.token && !leaving;
-  const ok = (await workAct(alive)) && (await sayAct(alive)) && (await faceAct(alive));
-  if (ok && alive() && !autoTried) {
-    autoTried = true;
-    if (await autoAdvance()) return;
+  // The first pass plays each step once, in order. After an interruption it picks up at the step
+  // it was on, so the progress line never goes back.
+  const first = !run.finished;
+  const step = async (k, act) => {
+    if (first && run.done.has(k)) return true;
+    if (first) stepStart(k);
+    const done = await act(alive);
+    if (done && first && alive()) stepDone(k);
+    return done;
+  };
+  const ok = (await step(0, workAct)) && (await step(1, sayAct)) && (await step(2, faceAct));
+  if (ok && alive() && first) {
+    finishPass();
+    return;
   }
-  if (alive()) scheduleCycle(ok ? between(...CYCLE.pause) : CYCLE.retry);
+  if (alive() && !leaving) scheduleCycle(ok ? between(...CYCLE.pause) : CYCLE.retry);
 }
 
-// After one full pass (code, both lines, the face) the intro moves on by itself, with a short
-// countdown on the bottom line. Any key, click, scroll or mouse movement cancels it, and the
-// intro keeps playing for whoever is still watching.
-const AUTO = { seconds: 3, quiet: 2500 };
-let autoTried = false;
-let lastInput = performance.now();
-for (const type of ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"])
-  window.addEventListener(type, () => (lastInput = performance.now()), { capture: true, passive: true });
+// How far the intro is, on the bottom line: three steps, then my work. The intro is not something
+// to play with, so nothing a visitor does stops it. "see my work" (or enter) only gets there sooner.
+// Each step's typical length (ms) moves the bar along while the step plays; it only ever moves forward.
+const STEPS = [
+  { label: "my code", ms: 6500 },
+  { label: "hello", ms: 5000 },
+  { label: "my face", ms: 13000 },
+];
+const TOTAL_MS = STEPS.reduce((sum, item) => sum + item.ms, 0);
+const AUTO = { seconds: 3, deadline: TOTAL_MS * 2 + 10000, still: 8000 };
+const run = { step: 0, stepAt: 0, startedAt: 0, done: new Set(), shown: 0, finished: false, advancing: false, left: 0, hintUntil: 0, timer: 0 };
+
+function startRun() {
+  if (run.startedAt) return;
+  run.startedAt = run.stepAt = performance.now();
+  renderProgress();
+  run.timer = setInterval(tickRun, 120);
+}
+
+function stepStart(k) {
+  if (run.finished || k <= run.step && run.stepAt) return;
+  run.step = k;
+  run.stepAt = performance.now();
+}
+
+function stepDone(k) {
+  if (run.done.has(k)) return;
+  run.done.add(k);
+  sfx.tick(4 + k);
+  if (k + 1 < STEPS.length) stepStart(k + 1);
+}
+
+function runFraction(now) {
+  if (run.finished) return 1;
+  if (prefersStill()) return Math.min(1, (now - run.startedAt) / AUTO.still);
+  let ms = 0;
+  for (let k = 0; k < STEPS.length; k++) {
+    if (run.done.has(k)) ms += STEPS[k].ms;
+    else if (k === run.step) ms += Math.min(0.92, (now - run.stepAt) / STEPS[k].ms) * STEPS[k].ms;
+  }
+  return ms / TOTAL_MS;
+}
+
+function tickRun() {
+  if (leaving) return clearInterval(run.timer);
+  const now = performance.now();
+  run.shown = Math.max(run.shown, runFraction(now));
+  // A safety net: reduced motion, or an intro that keeps getting held up, still ends.
+  if (!run.finished && (run.shown >= 1 || now - run.startedAt > AUTO.deadline)) finishPass();
+  renderProgress();
+}
+
+function finishPass() {
+  if (run.finished) return;
+  run.finished = true;
+  run.shown = 1;
+  for (let k = 0; k < STEPS.length; k++) run.done.add(k);
+  director.token++;
+  clearTimeout(director.timer);
+  renderProgress();
+  autoAdvance();
+}
+
+// The line as parts: [text before, filled bar, empty bar, text after].
+function progressParts(room) {
+  const k = Math.min(run.step, STEPS.length - 1);
+  const bar = (cells) => {
+    const full = Math.round(run.shown * cells);
+    return ["█".repeat(full), "░".repeat(cells - full)];
+  };
+  if (run.left) {
+    const head = `// opening my work in ${run.left}…`;
+    return room - head.length - 2 >= 8 ? [`${head}  `, ...bar(Math.min(32, room - head.length - 2)), ""] : [head, "", "", ""];
+  }
+  const where = run.finished ? "done" : `${k + 1}/${STEPS.length} ${STEPS[k].label}`;
+  const next = `then ${run.finished || k === STEPS.length - 1 ? "my work" : STEPS[k + 1].label}`;
+  const head = `// intro ${where}`;
+  for (const tail of [`  ${next}`, ""]) {
+    const cells = room - head.length - tail.length - 2;
+    if (cells >= 8) return [`${head}  `, ...bar(Math.min(32, cells)), tail];
+  }
+  const count = `${run.finished ? STEPS.length : k + 1}/${STEPS.length} `;
+  const short = room - count.length >= 12 ? `intro ${count}` : count;
+  return [short, ...bar(Math.max(5, Math.min(24, room - short.length))), ""];
+}
+
+let progressKey = "";
+function renderProgress() {
+  if (!noteLine || !run.startedAt || leaving || performance.now() < run.hintUntil) return;
+  const parts = progressParts(Math.max(12, wall?.noteRoom || 40));
+  const key = parts.join("|");
+  noteLine.style.visibility = "";
+  if (key === progressKey && noteLine.querySelector(".bar-full")) return;
+  progressKey = key;
+  const span = (className, text) => Object.assign(document.createElement("span"), { className, textContent: text });
+  noteLine.replaceChildren(parts[0], span("bar-full", parts[1]), span("bar-empty", parts[2]), parts[3]);
+}
 
 async function autoAdvance() {
-  if (gate) {
-    autoTried = false;
-    return false;
-  }
-  if (leaving || picker || object || visitorSession || !enterLink || !noteLine) return false;
-  if (performance.now() - lastInput < AUTO.quiet) return false;
-  const started = performance.now();
-  const cancelled = () => lastInput > started || leaving || picker || document.hidden;
+  if (run.advancing || leaving || !enterLink) return;
+  run.advancing = true;
   enterLink.classList.add("is-nudged");
-  noteLine.classList.add("is-hint");
+  noteLine?.classList.add("is-hint");
+  run.hintUntil = 0;
   for (let left = AUTO.seconds; left > 0; left--) {
-    noteLine.textContent = `// opening my work in ${left}… · press esc to stay`;
+    run.left = left;
+    renderProgress();
     sfx.tick(AUTO.seconds - left);
     for (let k = 0; k < 10; k++) {
       await sleep(100);
-      if (cancelled()) {
-        enterLink.classList.remove("is-nudged");
-        noteLine.classList.remove("is-hint");
-        noteLine.textContent = leaving ? noteLine.textContent : NOTE_TEXT;
-        return false;
-      }
+      // A theme menu or a hidden tab only pauses the countdown; it never cancels it.
+      while ((picker || document.hidden) && !leaving) await sleep(200);
+      if (leaving) return;
     }
   }
   enterLink.classList.remove("is-nudged");
   leave(enterLink.href);
-  return true;
 }
 
 async function workAct(alive) {
@@ -4228,13 +4329,18 @@ let hintTimer = 0;
 function introHint() {
   if (!noteLine) return;
   clearTimeout(hintTimer);
-  noteLine.textContent = "// this is just the intro: press enter to see my work";
+  if (run.advancing) return;
+  run.hintUntil = performance.now() + 3200;
+  noteLine.textContent = "// just the intro: my work opens by itself, or press enter";
   noteLine.classList.add("is-hint");
   enterLink?.classList.add("is-nudged");
   hintTimer = setTimeout(() => {
+    if (run.advancing) return;
     noteLine.classList.remove("is-hint");
     enterLink?.classList.remove("is-nudged");
-    noteLine.textContent = NOTE_TEXT;
+    run.hintUntil = 0;
+    if (run.startedAt) renderProgress();
+    else noteLine.textContent = NOTE_TEXT;
   }, 3200);
 }
 
@@ -4370,7 +4476,7 @@ useTheme(visit.theme);
 text = visit.files.flatMap((file) => file.lines.map((line) => line.trim())).filter(Boolean).join(" ");
 ({ codeText, codeKinds } = codeSource(visit.files));
 renderWall();
-bootView();
+introOpen.then(bootView);
 markSeen();
 navigator.keyboard
   ?.getLayoutMap?.()

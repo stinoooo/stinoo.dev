@@ -323,6 +323,16 @@ body {
   }
 }
 
+/* how far the intro is: the filled part of the bar in the accent, the rest dim */
+.note .bar-full {
+  color: var(--accent, var(--ink));
+}
+
+.note .bar-empty {
+  color: var(--chrome);
+  opacity: 0.55;
+}
+
 /* a key press on the read-only intro points the way in */
 .note.is-hint {
   color: var(--accent, var(--ink));
