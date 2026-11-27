@@ -1,0 +1,15 @@
+{
+  "name": "stinoo-dev",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "data": "node scripts/build-data.mjs --fetch-github",
+    "shots": "node scripts/shots.mjs",
+    "build": "node scripts/build.mjs",
+    "dev": "python serve.py"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "sharp": "0.34.4"
+  }
+}
