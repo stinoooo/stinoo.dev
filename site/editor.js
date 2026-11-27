@@ -4,6 +4,7 @@ import { createWheel } from "./wheel.js";
 import { createTerminal } from "./terminal.js";
 import { createPortrait } from "./portrait.js";
 import { sfx, soundToggle } from "/intros/shared/sfx.js";
+import { createCursor } from "/intros/shared/cursor.js";
 import { createTips } from "./tip.js";
 import { createLightbox } from "./lightbox.js";
 
@@ -97,6 +98,7 @@ const watch = {
   setText: () => {},
 };
 soundToggle($(".sound-toggle"));
+createCursor();
 let wheel = null;
 let hero = null;
 let typingBar = false;
@@ -156,7 +158,7 @@ const shipped = themes.filter((theme) => theme.included);
 const entries = [
   { id: "about", label: "about me", kind: "about", tile: "about" },
   ...projectEntries.filter((entry) => !entry.parent),
-  { id: "work", label: "work & school", kind: "work", tile: "work" },
+  { id: "work", label: "experience", kind: "work", tile: "work" },
   ...(content.talks?.length ? [{ id: "talks", label: "talks/", kind: "talks", tile: "talks" }] : []),
   ...(childrenOf("more").length ? [{ id: "more", label: "more projects", kind: "more" }] : []),
   ...(stack ? [{ id: "stack", label: "tech stack", kind: "stack", tile: "stack" }] : []),
@@ -213,7 +215,39 @@ const lightbox = createLightbox({
     sfx.open();
   },
 });
+// The prompt at the end of every page is a real input: type "help", "vardoxen" or
+// "theme paper" and press enter, with or without the colon.
+function promptInput() {
+  const input = document.createElement("input");
+  input.className = "t-input";
+  input.type = "text";
+  input.spellcheck = false;
+  input.autocomplete = "off";
+  input.setAttribute("autocapitalize", "off");
+  input.setAttribute("enterkeyhint", "go");
+  input.setAttribute("aria-label", "Type a command, for example help");
+  input.placeholder = "type a command · try help";
+  input.addEventListener("input", (event) => {
+    if (event.inputType?.startsWith("insert")) sfx.key(event.data || "");
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const text = input.value.trim().replace(/^:/, "");
+      input.value = "";
+      sfx.enter();
+      if (text) run(text);
+    } else if (event.key === "Escape") {
+      input.value = "";
+      input.blur();
+      buffer.focus({ preventScroll: true });
+    }
+  });
+  return input;
+}
+
 const terminal = createTerminal(buffer, {
+  prompt: promptInput,
   lightbox,
   get watch() {
     return watch;
@@ -483,14 +517,18 @@ const logRows = (list) =>
   ]);
 
 function workSpec() {
-  const jobs = (content.work || []).filter((item) => item.kind !== "talk");
+  const all = content.work || [];
+  const jobs = all.filter((item) => item.type !== "internship");
+  const internships = all.filter((item) => item.type === "internship");
+  const section = (cmd, list) => (list.length ? [{ cmd, out: logRows(list) }] : []);
   return {
     cwd: "~/work",
     branch: null,
     blocks: [
-      { cmd: "git log --format='%ad  %s' work/", out: logRows(jobs) },
-      ...(content.education?.length ? [{ cmd: "ls school/", out: logRows(content.education) }] : []),
-      ...(content.awards?.length ? [{ cmd: "cat awards.txt", out: logRows(content.awards) }] : []),
+      ...section("git log work/", jobs),
+      ...section("git log internships/", internships),
+      ...section("ls school/", content.education || []),
+      ...section("cat achievements.txt", content.awards || []),
     ],
   };
 }
@@ -581,7 +619,7 @@ function barView(entry) {
     return [["KIND", kind || "PROJECT"], ["WITH", (p.stack[0] || p.language || "—").toUpperCase()], p.github ? ["STARS", fmt(p.stars ?? 0)] : ["SOURCE", "PRIVATE"]];
   }
   if (entry.kind === "themes") return [["THEMES", String(themes.length)], ["BUILT-IN", String(themes.filter((theme) => theme.included).length)]];
-  if (entry.kind === "work") return [["ENTRIES", String((content.work || []).filter((item) => item.kind !== "talk").length)], ["SINCE", "2026"], ["NOW", "ARCNODE"]];
+  if (entry.kind === "work") return [["WORK", String((content.work || []).filter((item) => item.type !== "internship").length)], ["INTERNSHIPS", String((content.work || []).filter((item) => item.type === "internship").length)], ["AWARDS", String((content.awards || []).length)]];
   if (entry.kind === "talks") return [["TALKS", String((content.talks || []).length)]];
   if (entry.kind === "more") return [["PROJECTS", String(childrenOf("more").length)]];
   if (entry.kind === "stack") return [["LANGS", String(stack.languages.length)], ["TOOLS", String(stack.tools.length)], ["AI", String(stack.ai?.length ?? 0)]];
@@ -668,6 +706,7 @@ function helpSpec() {
           cmd("simple", "open the simple version of this site"),
           cmd("contact", "how to reach me"),
           cmd("help", "this list"),
+          { segments: [["or type at the › prompt below, no colon needed · press / to jump there", "t-dim"]] },
           cmd("q", "back to the intro"),
           { segments: [" "] },
           { segments: [["names    ", "t-key"], [names, "t-dim"]] },
@@ -876,6 +915,7 @@ function commandKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
+  if (event.target instanceof Element && event.target.closest(".t-input")) return;
   if (!event.repeat) watch?.pressKey(event.code, event.shiftKey);
   if (event.ctrlKey || event.metaKey || event.altKey || !booted) return;
   if (command !== null) {
@@ -883,6 +923,14 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   const target = event.target instanceof Element ? event.target : null;
+  if (event.key === "/" && !event.repeat) {
+    const prompt = buffer.querySelector(".t-input");
+    if (prompt) {
+      event.preventDefault();
+      prompt.focus({ preventScroll: false });
+      return;
+    }
+  }
   if (target?.closest(".rack") || (target?.closest(".frame.is-xray") && ["Escape", "Enter", " "].includes(event.key))) return;
   if (event.key === ":") {
     event.preventDefault();
