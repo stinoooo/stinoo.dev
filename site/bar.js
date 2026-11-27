@@ -44,11 +44,13 @@ export function createBar(host) {
   }
 
   function paintGhost() {
+    if (!values.ghost) return;
     values.ghost.textContent = typing ? "typing" : repairing ? "repairing" : "idle";
     values.ghost.classList.toggle("is-hot", typing || repairing);
   }
 
   function setState({ worm, eye, ghost }) {
+    if (!values.worm) return;
     values.worm.textContent = worm.text;
     values.worm.classList.toggle("is-hot", worm.hot);
     values.eye.textContent = eye.text;
@@ -99,7 +101,7 @@ export function createBar(host) {
 
   function setSeen(data) {
     seen = data;
-    graph.dataset.tip = `visitors per hour · ${fmt(data.total)} since ${(data.since || "").slice(5, 10)}\nno cookies · no stored IPs`;
+    graph.dataset.tip = `visitors per hour · ${fmt(data.total)} since ${(data.since || "").slice(5, 10)}\nno cookies · no IP addresses`;
     draw();
   }
 
