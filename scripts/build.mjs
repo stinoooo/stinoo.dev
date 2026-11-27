@@ -16,7 +16,7 @@ const OUT = path.join(ROOT, "dist");
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, "portfolio.config.json"), "utf8"));
 const SITE = `https://${config.identity.domain}`;
 const NAME = config.identity.name;
-const DESCRIPTION = "Stijn Heemskerk: junior full stack software engineer at Bemmel & Kroon and Software Engineering student from Leiden. Games, desktop apps and the web, under Arcnode.";
+const DESCRIPTION = "Stijn Heemskerk: junior full stack software engineer at Bemmel & Kroon and Software Engineering student from Leiden. Builds web apps, desktop apps and games under Arcnode.";
 
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 const hash = (data) => crypto.createHash("sha256").update(data).digest("hex").slice(0, 10);
