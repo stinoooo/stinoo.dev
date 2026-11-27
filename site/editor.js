@@ -7,6 +7,7 @@ import { sfx, soundToggle } from "/intros/shared/sfx.js";
 import { createCursor } from "/intros/shared/cursor.js";
 import { createTips } from "./tip.js";
 import { createLightbox } from "./lightbox.js";
+import { createSearch, markIn, clearMarks } from "./search.js";
 
 const $ = (selector) => document.querySelector(selector);
 const make = (tag, className, text) => {
@@ -86,6 +87,7 @@ let cleanup = null;
 let typingToken = 0;
 let clearTimer = 0;
 let command = null;
+let jumpNow = false;
 // The template's keyboard-and-eye layer is gone; its hooks now drive the interface sounds.
 const watch = {
   pressChar: (ch) => sfx.key(ch),
@@ -201,7 +203,7 @@ function markSeen() {
 document.addEventListener("visibilitychange", loadSeen);
 loadSeen();
 markSeen();
-const KEYS = { wide: "click anything on the left, or use ↑ ↓ · ← → screenshots · :help for commands", touch: "swipe the list · tap to open", closed: "tap ~/Projects ↓ to see everything" };
+const KEYS = { wide: "click anything on the left, or use ↑ ↓ · ← → screenshots · / search · :help for commands", touch: "swipe the list · tap to open", closed: "tap ~/Projects ↓ to see everything" };
 const paintKeys = () => bar.setKeys(narrow.matches ? (editor.classList.contains("is-tree-open") ? KEYS.touch : KEYS.closed) : matchMedia("(pointer: fine)").matches ? KEYS.wide : KEYS.touch);
 paintKeys();
 
@@ -635,6 +637,10 @@ function barView(entry) {
 
 function open(entry) {
   if (entry === openEntry) return;
+  // A jump from search draws the page at once instead of typing it out.
+  const instant = jumpNow;
+  jumpNow = false;
+  clearMarks();
   if (booted) sfx.select();
   if (cleanup) cleanup();
   cleanup = null;
@@ -650,12 +656,12 @@ function open(entry) {
     const project = entry.data;
     winbar.textContent = `fish — ~/Projects/${project.repo}`;
     tabFile.textContent = `/${project.repo}`;
-    terminal.show(projectSpec(project));
+    terminal.show(projectSpec(project), { instant });
     cleanup = () => terminal.destroy();
   } else if (entry.kind === "about") {
     winbar.textContent = `fish — ~ · ${about.name}`;
     tabFile.textContent = "/";
-    hero = terminal.show(aboutSpec());
+    hero = terminal.show(aboutSpec(), { instant });
     cleanup = () => {
       terminal.destroy();
       hero = null;
@@ -663,29 +669,29 @@ function open(entry) {
   } else if (entry.kind === "stack") {
     winbar.textContent = `fish — ~ · stack`;
     tabFile.textContent = "/stack/";
-    terminal.show(stackSpec());
+    terminal.show(stackSpec(), { instant });
     cleanup = () => terminal.destroy();
   } else if (entry.kind === "work") {
     const orgs = (content.work || []).map((w) => w.org).filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).slice(0, 4);
     winbar.textContent = orgs.length ? `work/ — ${orgs.join(" · ")}` : "work/";
     tabFile.textContent = "/work/";
-    terminal.show(workSpec());
+    terminal.show(workSpec(), { instant });
     cleanup = () => terminal.destroy();
   } else if (entry.kind === "talks") {
     winbar.textContent = `talks/ — ${(content.talks || []).length} talks`;
     tabFile.textContent = "/talks/";
-    terminal.show(talksSpec());
+    terminal.show(talksSpec(), { instant });
     cleanup = () => terminal.destroy();
   } else if (entry.kind === "more") {
     winbar.textContent = `more/ — ${childrenOf("more").length} projects`;
     tabFile.textContent = "/more/";
-    terminal.show(moreSpec());
+    terminal.show(moreSpec(), { instant });
     cleanup = () => terminal.destroy();
   } else if (entry.kind === "themes") {
     const included = themes.filter((theme) => theme.included).length;
     winbar.textContent = `themes/ — ${themes.length} themes · ${included} built-in`;
     tabFile.textContent = "/themes/";
-    terminal.show(themesSpec());
+    terminal.show(themesSpec(), { instant });
     cleanup = () => terminal.destroy();
     typeCmd(":e themes/");
   }
@@ -705,6 +711,7 @@ function helpSpec() {
         out: [
           { segments: ["Type : anywhere to start a command, then press enter. Esc cancels."], className: "t-dim" },
           { segments: [" "] },
+          cmd("search <words>", "search every project, job and tool", "search rust"),
           cmd("e <name>", "open a page or a project", "e arcnode-remote"),
           cmd("<name>", "the same, shorter", "vardoxen"),
           cmd("theme", "pick a color theme"),
@@ -713,7 +720,7 @@ function helpSpec() {
           cmd("simple", "open the simple version of this site"),
           cmd("contact", "how to reach me"),
           cmd("help", "this list"),
-          { segments: [["or type at the › prompt below, no colon needed · press / to jump there", "t-dim"]] },
+          { segments: [["or type at the › prompt below, no colon needed", "t-dim"]] },
           cmd("q", "back to the intro"),
           { segments: [" "] },
           { segments: [["names    ", "t-key"], [names, "t-dim"]] },
@@ -722,6 +729,7 @@ function helpSpec() {
       {
         cmd: "help keys",
         out: [
+          key("/  or  ctrl k", "search everything: projects, work, school, stack"),
           key("↑ ↓  or  j k", "move through the list on the left"),
           key("enter", "open what is selected"),
           key("← →  or  h l", "previous or next screenshot"),
@@ -737,6 +745,7 @@ function helpSpec() {
 }
 
 function showHelp() {
+  clearMarks();
   if (cleanup) cleanup();
   cleanup = () => terminal.destroy();
   hero = null;
@@ -746,10 +755,71 @@ function showHelp() {
   buffer.dataset.kind = "help";
   winbar.textContent = "help — commands and keys";
   tabFile.textContent = "/help";
-  bar.setView([["COMMANDS", "10"], ["KEYS", "7"]]);
+  bar.setView([["COMMANDS", "11"], ["KEYS", "8"]]);
   terminal.show(helpSpec());
   sfx.select();
 }
+
+// One searchable document per page in the list, with the lines that page shows.
+function searchDocs() {
+  const docs = [];
+  const entryLine = (item) => [[item.title, item.name, item.org, item.place, item.where].filter(Boolean).join(" · "), item.desc];
+  for (const entry of entries) {
+    if (entry.kind === "project") {
+      const p = entry.data;
+      docs.push({
+        entry,
+        title: p.name || p.repo,
+        meta: p.tag || "project",
+        keywords: [...(p.stack || []), p.language].filter(Boolean).join(" "),
+        lines: [p.description, ...(p.case ? [p.case.problem, p.case.built, p.case.result] : []), ...(p.lines || [])],
+      });
+    } else if (entry.kind === "about") {
+      docs.push({ entry, title: "About me", meta: "about · contact", lines: [...about.bio, "contact: stijn@stinoo.dev · github.com/stinoooo · linkedin.com/in/stijnheemskerk · x.com/s_tinoo · discord bossmannn"] });
+    } else if (entry.kind === "work") {
+      const all = [...(content.work || []), ...(content.education || []), ...(content.awards || [])];
+      docs.push({ entry, title: "Experience", meta: "work · internships · school · awards", lines: all.flatMap(entryLine) });
+    } else if (entry.kind === "talks") {
+      docs.push({ entry, title: "Talks", meta: "talks", lines: (content.talks || []).flatMap(entryLine) });
+    } else if (entry.kind === "stack" && stack) {
+      docs.push({ entry, title: "Tech stack", meta: "languages · tools · AI · this site", lines: [...stack.languages, ...stack.tools, ...(stack.ai || []), ...stack.site].map((item) => item.name) });
+    } else if (entry.kind === "themes") {
+      docs.push({ entry, title: "Color themes", meta: `${themes.length} themes`, lines: themes.map((theme) => `${theme.name}: ${theme.description || ""}`) });
+    }
+  }
+  return docs;
+}
+
+const searchButton = $(".search-open");
+const search = createSearch({
+  docs: searchDocs(),
+  fallback: buffer,
+  suggestions: ["rust", "discord", "encrypted", "godot", "next.js"],
+  onOpen() {
+    sfx.open();
+    tips.hide();
+    searchButton?.setAttribute("aria-expanded", "true");
+  },
+  onClose() {
+    searchButton?.setAttribute("aria-expanded", "false");
+  },
+  onPick(doc, terms, line) {
+    closeDrawer();
+    jumpNow = true;
+    if (doc.entry === openEntry) jumpNow = false;
+    else goTo(doc.entry);
+    jumpNow = false;
+    // The page draws at once; mark the words as soon as they are on it.
+    let tries = 0;
+    const mark = () => {
+      if (markIn(buffer, terms, line) || ++tries > 30) return;
+      requestAnimationFrame(mark);
+    };
+    requestAnimationFrame(mark);
+    say(`/${terms.join(" ")}`);
+  },
+});
+searchButton?.addEventListener("click", () => search.show());
 
 function contact() {
   goTo(entries.find((entry) => entry.kind === "about"));
@@ -842,9 +912,12 @@ function scheme(name) {
 }
 
 function run(text) {
+  // "/rust", like searching in vim
+  if (text.trim().startsWith("/")) return search.show(text.trim().slice(1));
   const [name, ...rest] = text.trim().split(/\s+/);
   const arg = rest.join(" ");
   if (!name) return say("");
+  if (["search", "find", "grep", "s", "f"].includes(name.toLowerCase())) return search.show(arg);
   if (["help", "h", "?", "commands", "cmds"].includes(name.toLowerCase())) return showHelp();
   if (name === "sound") {
     sfx.set(!sfx.on);
@@ -922,6 +995,15 @@ function commandKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
+  if (search.open) return;
+  // Ctrl+K or ⌘K opens search from anywhere, even while typing at the prompt.
+  if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === "k") {
+    event.preventDefault();
+    command = null;
+    barHost.classList.remove("is-typing");
+    search.show();
+    return;
+  }
   if (event.target instanceof Element && event.target.closest(".t-input")) return;
   if (!event.repeat) watch?.pressKey(event.code, event.shiftKey);
   if (event.ctrlKey || event.metaKey || event.altKey || !booted) return;
@@ -931,12 +1013,9 @@ document.addEventListener("keydown", (event) => {
   }
   const target = event.target instanceof Element ? event.target : null;
   if (event.key === "/" && !event.repeat) {
-    const prompt = buffer.querySelector(".t-input");
-    if (prompt) {
-      event.preventDefault();
-      prompt.focus({ preventScroll: false });
-      return;
-    }
+    event.preventDefault();
+    search.show();
+    return;
   }
   if (target?.closest(".rack") || (target?.closest(".frame.is-xray") && ["Escape", "Enter", " "].includes(event.key))) return;
   if (event.key === ":") {
