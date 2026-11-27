@@ -5,6 +5,7 @@
 // CSS inlined into the page, fonts and first data preloaded, and the metadata a link preview
 // and a search engine need. The data files keep their names and are revalidated on every visit.
 import * as esbuild from "esbuild";
+import sharp from "sharp";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -113,6 +114,9 @@ function head({ title, description, path: page, preload = [] }) {
     `<meta name="twitter:card" content="summary_large_image">`,
     `<meta name="twitter:creator" content="@s_tinoo">`,
     `<link rel="icon" href="/favicon.svg" type="image/svg+xml">`,
+    `<link rel="apple-touch-icon" href="/apple-touch-icon.png">`,
+    `<link rel="manifest" href="/site.webmanifest">`,
+    `<link rel="alternate" type="text/plain" href="/llms.txt" title="This portfolio as plain text, for language models">`,
     `<link rel="preload" href="/assets/fonts/plex-mono.woff2" as="font" type="font/woff2" crossorigin>`,
     ...preload,
     `<script type="application/ld+json">${JSON.stringify(person)}</script>`,
@@ -174,6 +178,13 @@ write(
 );
 
 const json = (file) => JSON.parse(read(file));
+// Every screenshot's real size, so /simple/ reserves the right space before an image loads.
+const dims = {};
+for (const file of fs.readdirSync(path.join(ROOT, "site/shots")).filter((f) => /\.(webp|png|jpe?g)$/.test(f))) {
+  const { width, height } = await sharp(path.join(ROOT, "site/shots", file)).metadata();
+  dims[`shots/${file}`] = [width, height];
+}
+const today = new Date().toISOString().slice(0, 10);
 write(
   "simple/index.html",
   renderSimple({
@@ -182,16 +193,103 @@ write(
     snapshot: json("github-snapshot.json"),
     stack: json("site/stack.json"),
     styles: await css(["simple/simple.css"]),
+    dims,
+    updated: today,
     head: head({
       title: "Stijn Heemskerk · junior full stack software engineer",
       description: DESCRIPTION,
       path: "/simple/",
-    }).replace(/<link rel="preload" href="\/assets\/fonts\/plex-mono.woff2"[^>]*>/, '<link rel="preload" href="/assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>'),
+    })
+      .replace(/<link rel="preload" href="\/assets\/fonts\/plex-mono.woff2"[^>]*>/, '<link rel="preload" href="/assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>')
+      .replace('<meta name="theme-color" content="#0b0b0a">', '<meta name="theme-color" content="#faf7f1" media="(prefers-color-scheme: light)">\n<meta name="theme-color" content="#0f0e0d" media="(prefers-color-scheme: dark)">')
+      .replace('<meta name="color-scheme" content="dark light">', '<meta name="color-scheme" content="light dark">'),
   }),
 );
 
-write("robots.txt", `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
-const today = new Date().toISOString().slice(0, 10);
+write("robots.txt", `# stinoo.dev: everything here is public and may be read and indexed.\n# A plain-text version for language models: ${SITE}/llms.txt\nUser-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
+
+// llms.txt (https://llmstxt.org): the portfolio as plain Markdown, so a language model or a
+// script gets the facts without driving a terminal. llms-full.txt adds every case study.
+{
+  const content = json("site/content.json");
+  const plain = (s) => String(s ?? "").replace(/\s+/g, " ").trim();
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = (s) => s.replace(/(\d\d)\/(\d{4})/g, (_, m, y) => `${MONTHS[Number(m) - 1]} ${y}`);
+  const projects = content.projects.map((p) => ({ ...p, ...(config.projects.find((c) => c.name === p.name) || {}) }));
+  const link = (label, url) => (url ? `[${label}](${url})` : label);
+  const entry = (i) => `- ${i.title}${i.org ? `, ${i.org}` : ""}${i.where ? ` (${i.where})` : ""}, ${month(i.when)}${i.desc ? `: ${plain(i.desc)}` : ""}`;
+  const contact = config.links.map((l) => `- ${l.label}: ${l.url.replace(/^mailto:/, "")}`).concat("- Discord: bossmannn");
+  const intro = [`# ${NAME}`, "", `> ${DESCRIPTION}`, "", plain(config.about?.bio || ""), ""];
+  const pages = [
+    "## Pages",
+    "",
+    `- [Simple version](${SITE}/simple/): the whole portfolio as one readable page. The best page to read or quote.`,
+    `- [Interactive version](${SITE}/): a short intro that draws me out of my own code, then opens the editor.`,
+    `- [Editor](${SITE}/site/): projects, work and stack, browsed like files in a terminal editor.`,
+    "",
+  ];
+  const rest = [
+    "## Experience",
+    "",
+    ...config.work.map(entry),
+    "",
+    "## Education",
+    "",
+    ...(config.education || []).map(entry),
+    "",
+    "## Achievements",
+    "",
+    ...(config.awards || []).map(entry),
+    "",
+    "## Contact",
+    "",
+    ...contact,
+    "",
+  ];
+  const list = ["## Projects", "", ...projects.map((p) => `- ${link(p.name, p.url)}${p.tag ? ` (${p.tag})` : ""}: ${plain(p.description)}`), ""];
+  const full = [
+    "## Projects",
+    "",
+    ...projects.flatMap((p) => [
+      `### ${p.name}`,
+      "",
+      ...([p.tag, p.url].filter(Boolean).length ? [[p.tag, p.url].filter(Boolean).join(" · "), ""] : []),
+      plain(p.description),
+      "",
+      ...(p.case ? [`**The problem.** ${plain(p.case.problem)}`, "", `**What I built.** ${plain(p.case.built)}`, "", `**The result.** ${plain(p.case.result)}`, ""] : p.long ? [plain(p.long), ""] : []),
+      ...(p.stack?.length ? [`Built with: ${p.stack.join(", ")}`, ""] : []),
+    ]),
+  ];
+  write("llms.txt", [...intro, ...pages, ...list, ...rest, "## Optional", "", `- [Full text](${SITE}/llms-full.txt): every project with its case study and stack.`, ""].join("\n"));
+  write("llms-full.txt", [...intro, ...pages, ...full, ...rest].join("\n"));
+}
+
+// Icons for a home screen or a tab strip, drawn from favicon.svg on the site's own dark.
+{
+  const mark = (px, pad) =>
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${px}" height="${px}" viewBox="${-pad} ${-4 - pad} ${88 + 2 * pad} ${88 + 2 * pad}"><rect x="${-pad}" y="${-4 - pad}" width="${88 + 2 * pad}" height="${88 + 2 * pad}" fill="#0b0b0a"/><path fill="#e7c58a" d="M8 16L36 40L8 64L18 74L54 40L18 6Z"/><path fill="#ebe6db" d="M52 62H84V74H52Z"/></svg>`;
+  for (const [file, px, pad] of [["apple-touch-icon.png", 180, 22], ["icon-192.png", 192, 22], ["icon-512.png", 512, 22], ["icon-maskable-512.png", 512, 44]]) {
+    write(file, await sharp(Buffer.from(mark(px, pad))).png({ compressionLevel: 9 }).toBuffer());
+  }
+  write(
+    "site.webmanifest",
+    JSON.stringify({
+      name: `${NAME} · stinoo.dev`,
+      short_name: "stinoo.dev",
+      description: DESCRIPTION,
+      start_url: "/",
+      scope: "/",
+      display: "browser",
+      background_color: "#0b0b0a",
+      theme_color: "#0b0b0a",
+      icons: [
+        { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+        { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
+        { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      ],
+    }),
+  );
+}
 write(
   "sitemap.xml",
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${["/", "/site/", "/simple/"].map((p) => `  <url><loc>${SITE}${p}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`,
