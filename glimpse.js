@@ -1600,7 +1600,45 @@ async function runCycle() {
   const token = ++director.token;
   const alive = () => token === director.token && !leaving;
   const ok = (await workAct(alive)) && (await sayAct(alive)) && (await faceAct(alive));
+  if (ok && alive() && !autoTried) {
+    autoTried = true;
+    if (await autoAdvance()) return;
+  }
   if (alive()) scheduleCycle(ok ? between(...CYCLE.pause) : CYCLE.retry);
+}
+
+// After one full pass (code, both lines, the face) the intro moves on by itself, with a short
+// countdown on the bottom line. Any key, click, scroll or mouse movement cancels it, and the
+// intro keeps playing for whoever is still watching.
+const AUTO = { seconds: 3, quiet: 2500 };
+let autoTried = false;
+let lastInput = performance.now();
+for (const type of ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"])
+  window.addEventListener(type, () => (lastInput = performance.now()), { capture: true, passive: true });
+
+async function autoAdvance() {
+  if (leaving || picker || object || visitorSession || !enterLink || !noteLine) return false;
+  if (performance.now() - lastInput < AUTO.quiet) return false;
+  const started = performance.now();
+  const cancelled = () => lastInput > started || leaving || picker || document.hidden;
+  enterLink.classList.add("is-nudged");
+  noteLine.classList.add("is-hint");
+  for (let left = AUTO.seconds; left > 0; left--) {
+    noteLine.textContent = `// opening my work in ${left}… · press esc to stay`;
+    sfx.tick(AUTO.seconds - left);
+    for (let k = 0; k < 10; k++) {
+      await sleep(100);
+      if (cancelled()) {
+        enterLink.classList.remove("is-nudged");
+        noteLine.classList.remove("is-hint");
+        noteLine.textContent = leaving ? noteLine.textContent : NOTE_TEXT;
+        return false;
+      }
+    }
+  }
+  enterLink.classList.remove("is-nudged");
+  leave(enterLink.href);
+  return true;
 }
 
 async function workAct(alive) {
