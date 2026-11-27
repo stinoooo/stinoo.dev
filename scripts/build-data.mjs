@@ -214,12 +214,20 @@ const projects = CONFIG.projects.map((p) => {
   const full = p.githubRepo || (p.url?.startsWith("https://github.com/") ? p.url.replace("https://github.com/", "").replace(/\/$/, "") : null);
   // Offline runs keep the numbers from the last run with --fetch-github instead of dropping them.
   const facts = FETCH_GH ? repoFacts(full) : PREVIOUS.get(id) || {};
-  const images = (p.shots || []).map((s, i) => ({
-    file: s.startsWith("shots/") ? s : `shots/${path.basename(s)}`,
-    source: s,
-    alt: `${p.name} screenshot ${i + 1}`,
-    xray: false,
-  }));
+  // A shot is a path, { file, alt } or a film: { film, poster, duration, alt, name }.
+  const images = (p.shots || []).map((s, i) => {
+    const shot = typeof s === "string" ? { file: s } : s;
+    const file = shot.poster || shot.file;
+    return {
+      file: file.startsWith("shots/") ? file : `shots/${path.basename(file)}`,
+      source: shot.film || file,
+      alt: shot.alt || `${p.name} screenshot ${i + 1}`,
+      ...(shot.name ? { label: shot.name } : {}),
+      ...(shot.film ? { kind: "film", video: shot.film, duration: shot.duration } : {}),
+      xray: false,
+    };
+  });
+  const cover = images.find((image) => image.kind !== "film")?.file || images[0]?.file || null;
   const lines = [
     `# ${p.name}`,
     "",
@@ -230,6 +238,21 @@ const projects = CONFIG.projects.map((p) => {
     ...wrap(p.long || p.desc),
     "",
     ...(p.stack?.length ? ["Built with " + p.stack.join(" · "), ""] : []),
+    ...(p.case
+      ? [
+          "## Case study",
+          "",
+          "**The problem**",
+          ...wrap(p.case.problem),
+          "",
+          "**What I built**",
+          ...wrap(p.case.built),
+          "",
+          "**The result**",
+          ...wrap(p.case.result),
+          "",
+        ]
+      : []),
     ...images.slice(1).flatMap((_, i) => [`\u0001IMG${i + 1}\u0001`, ""]),
     ...(p.url ? [`[Visit](${p.url})`] : []),
     ...(p.links || []).map((l) => `[${l.label}](${l.url})`),
@@ -256,6 +279,8 @@ const projects = CONFIG.projects.map((p) => {
     counts: {},
     github: full ? `https://github.com/${full}` : null,
     stack: p.stack || [],
+    case: p.case || null,
+    cover,
     images,
     lines,
   };

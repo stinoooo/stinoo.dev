@@ -27,16 +27,32 @@ const SKILLS = [
   ["Languages I speak", "Dutch and English"],
 ];
 
+function media(p) {
+  const film = p.images?.find((image) => image.kind === "film");
+  if (film) {
+    return `<div class="shot"><video controls preload="none" playsinline poster="/site/${esc(film.file)}" width="1280" height="720" aria-label="${esc(film.alt)}"><source src="/site/${esc(film.video)}" type="video/mp4"></video></div>`;
+  }
+  const cover = p.cover || p.images?.[0]?.file;
+  return cover ? `<a class="shot" href="${esc(p.url || "#")}" tabindex="-1" aria-hidden="true"><img src="/site/${esc(cover)}" alt="" width="1280" height="800" loading="lazy" decoding="async"></a>` : "";
+}
+
+function caseStudy(c) {
+  return `<dl class="case" aria-label="Case study">
+      <div><dt>The problem</dt><dd>${esc(c.problem)}</dd></div>
+      <div><dt>What I built</dt><dd>${esc(c.built)}</dd></div>
+      <div><dt>The result</dt><dd>${esc(c.result)}</dd></div>
+    </dl>`;
+}
+
 function project(p, { featured }) {
-  const shot = p.images?.[0];
   const links = [p.url && `<a href="${esc(p.url)}">${esc(bare(p.url))}</a>`, ...(p.links || []).map((l) => `<a href="${esc(l.url)}">${esc(l.label)}</a>`)].filter(Boolean).join("");
   return `<article class="project${featured ? " is-featured" : ""}" id="${slug(p.name)}">
-  ${shot ? `<a class="shot" href="${esc(p.url || "#")}" tabindex="-1" aria-hidden="true"><img src="/site/${esc(shot.file)}" alt="" width="1280" height="800" loading="lazy" decoding="async"></a>` : ""}
+  ${media(p)}
   <div class="project-body">
     <p class="tag">${esc(p.tag)}</p>
     <h3>${esc(p.name)}</h3>
     <p class="lead">${esc(p.description)}</p>
-    ${featured && p.long ? `<p>${esc(p.long)}</p>` : ""}
+    ${featured && p.case ? caseStudy(p.case) : featured && p.long ? `<p>${esc(p.long)}</p>` : ""}
     ${p.stack?.length ? `<ul class="chips" aria-label="Built with">${p.stack.map((s) => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
     ${links ? `<p class="links">${links}</p>` : ""}
   </div>
