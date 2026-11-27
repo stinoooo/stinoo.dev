@@ -124,7 +124,7 @@ ${head}
 
 <section class="facts" aria-label="At a glance">
   <dl>
-    <div><dt>Now</dt><dd>Junior full stack engineer, Bemmel &amp; Kroon</dd></div>
+    <div><dt>Now</dt><dd>Junior full stack software engineer, Bemmel &amp; Kroon</dd></div>
     <div><dt>Studying</dt><dd>Software Engineering (bachelor)</dd></div>
     <div><dt>Studio</dt><dd><a href="https://arcnode.dev">Arcnode</a>, since 2026</dd></div>
     <div><dt>This year on GitHub</dt><dd>${fmt(snapshot.contributions.total)} contributions</dd></div>
