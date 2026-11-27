@@ -1,36 +1,25 @@
 {
  "from": "2026-01-01",
- "to": "2026-11-24",
- "fetchedAt": "2026-11-25T09:11:39.159Z",
- "scope": "Sample monthly commits",
+ "to": "2026-11-27",
+ "fetchedAt": "2026-11-27T15:38:20.942Z",
+ "scope": "GitHub-attributed public commit contributions per repository and month",
  "months": [
   {
    "month": "2026-01",
-   "top": [
-    {
-     "repo": "pulsedb",
-     "owner": "alexrivera",
-     "commits": 12
-    },
-    {
-     "repo": "tracekit",
-     "owner": "alexrivera",
-     "commits": 4
-    }
-   ]
+   "top": []
   },
   {
    "month": "2026-02",
    "top": [
     {
-     "repo": "termflow",
-     "owner": "alexrivera",
-     "commits": 19
+     "repo": "ArcInternship",
+     "owner": "stinoooo",
+     "commits": 53
     },
     {
-     "repo": "pulsedb",
-     "owner": "alexrivera",
-     "commits": 9
+     "repo": "ArcJournal",
+     "owner": "stinoooo",
+     "commits": 43
     }
    ]
   },
@@ -38,14 +27,9 @@
    "month": "2026-03",
    "top": [
     {
-     "repo": "tracekit",
-     "owner": "alexrivera",
-     "commits": 26
-    },
-    {
-     "repo": "minikv",
-     "owner": "alexrivera",
-     "commits": 14
+     "repo": "ArcInternship",
+     "owner": "stinoooo",
+     "commits": 12
     }
    ]
   },
@@ -53,104 +37,80 @@
    "month": "2026-04",
    "top": [
     {
-     "repo": "schemasync",
-     "owner": "alexrivera",
+     "repo": "ArcUnzip",
+     "owner": "stinoooo",
+     "commits": 41
+    },
+    {
+     "repo": "stinoooo",
+     "owner": "stinoooo",
      "commits": 33
     },
     {
-     "repo": "termflow",
-     "owner": "alexrivera",
-     "commits": 5
+     "repo": "ArcFlux",
+     "owner": "stinoooo",
+     "commits": 15
+    },
+    {
+     "repo": "workout-master",
+     "owner": "stinoooo",
+     "commits": 12
+    },
+    {
+     "repo": "discord-automod-bot-badge",
+     "owner": "stinoooo",
+     "commits": 4
     }
    ]
   },
   {
    "month": "2026-05",
-   "top": [
-    {
-     "repo": "pulsedb",
-     "owner": "alexrivera",
-     "commits": 17
-    },
-    {
-     "repo": "tracekit",
-     "owner": "alexrivera",
-     "commits": 10
-    }
-   ]
+   "top": []
   },
   {
    "month": "2026-06",
-   "top": [
-    {
-     "repo": "termflow",
-     "owner": "alexrivera",
-     "commits": 24
-    },
-    {
-     "repo": "pulsedb",
-     "owner": "alexrivera",
-     "commits": 15
-    }
-   ]
+   "top": []
   },
   {
    "month": "2026-07",
    "top": [
     {
-     "repo": "tracekit",
-     "owner": "alexrivera",
-     "commits": 31
-    },
-    {
-     "repo": "minikv",
-     "owner": "alexrivera",
-     "commits": 6
+     "repo": "ArcInternship",
+     "owner": "stinoooo",
+     "commits": 2
     }
    ]
   },
   {
    "month": "2026-08",
-   "top": [
-    {
-     "repo": "schemasync",
-     "owner": "alexrivera",
-     "commits": 15
-    },
-    {
-     "repo": "termflow",
-     "owner": "alexrivera",
-     "commits": 11
-    }
-   ]
+   "top": []
   },
   {
    "month": "2026-09",
-   "top": [
-    {
-     "repo": "pulsedb",
-     "owner": "alexrivera",
-     "commits": 22
-    },
-    {
-     "repo": "tracekit",
-     "owner": "alexrivera",
-     "commits": 16
-    }
-   ]
+   "top": []
   },
   {
    "month": "2026-10",
    "top": [
     {
-     "repo": "termflow",
-     "owner": "alexrivera",
-     "commits": 29
+     "repo": "ArcJournal",
+     "owner": "stinoooo",
+     "commits": 28
     },
     {
-     "repo": "pulsedb",
-     "owner": "alexrivera",
-     "commits": 7
+     "repo": "stinoooo",
+     "owner": "stinoooo",
+     "commits": 20
+    },
+    {
+     "repo": "arcnode-releases",
+     "owner": "stinoooo",
+     "commits": 17
+    },
+    {
+     "repo": "rosa-vscode",
+     "owner": "stinoooo",
+     "commits": 10
     }
    ]
   },
@@ -158,14 +118,24 @@
    "month": "2026-11",
    "top": [
     {
-     "repo": "tracekit",
-     "owner": "alexrivera",
+     "repo": "ArcJournal",
+     "owner": "stinoooo",
      "commits": 13
     },
     {
-     "repo": "minikv",
-     "owner": "alexrivera",
-     "commits": 12
+     "repo": "ArcUnzip",
+     "owner": "stinoooo",
+     "commits": 5
+    },
+    {
+     "repo": "ArcFlux",
+     "owner": "stinoooo",
+     "commits": 3
+    },
+    {
+     "repo": "stinoo.dev",
+     "owner": "stinoooo",
+     "commits": 1
     }
    ]
   }
