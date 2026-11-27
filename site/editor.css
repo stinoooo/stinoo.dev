@@ -2011,3 +2011,26 @@ a.md-link:hover {
     font-size: 11px;
   }
 }
+
+/* the prompt at the end of every page takes typed commands */
+.t-input {
+  width: calc(100% - 3ch);
+  min-width: 12ch;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  caret-color: var(--accent);
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.t-input::placeholder {
+  color: var(--dim);
+  opacity: 1;
+}
+
+.t-input:focus::placeholder {
+  color: transparent;
+}

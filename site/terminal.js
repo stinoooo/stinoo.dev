@@ -622,7 +622,10 @@ export function createTerminal(buffer, options) {
       }
       if (mine !== token) return;
       const idle = row(prompt(spec.cwd, spec.branch), "t-prompt-row");
-      const cursor = row([["› ", "t-caret"], ["", "t-cursor"]], "t-idle");
+      // the last prompt takes typed commands, like a shell, when the page provides an input for it
+      const input = options.prompt?.();
+      const cursor = row([["› ", "t-caret"], ...(input ? [] : [["", "t-cursor"]])], "t-idle");
+      if (input) cursor.firstChild.append(input);
       buffer.append(idle, cursor);
     } finally {
       if (mine === token) onTyping?.(false);

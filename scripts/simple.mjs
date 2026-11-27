@@ -123,15 +123,17 @@ ${head}
 </section>
 
 <section id="experience">
-  <h2>Experience</h2>
-  ${timeline(config.work)}
+  <h2>Work</h2>
+  ${timeline(config.work.filter((w) => w.type !== "internship"))}
+  <h2 class="h2-sub">Internships</h2>
+  ${timeline(config.work.filter((w) => w.type === "internship"))}
   <div class="two">
     <div>
       <h2 class="h2-sub">Education</h2>
       ${timeline(config.education || [])}
     </div>
     <div>
-      <h2 class="h2-sub">Awards</h2>
+      <h2 class="h2-sub">Achievements</h2>
       ${timeline((config.awards || []).map((a) => ({ ...a, org: "", where: a.where })))}
     </div>
   </div>
@@ -146,7 +148,7 @@ ${head}
 <section id="about" class="about">
   <div>
     <h2>About me</h2>
-    <p>I started out in hospitality and retail, where I learned how much good contact with people matters. At Bemmel &amp; Kroon I grew from customer service and sales into building their software, and I'm studying Software Engineering next to that. I'm early in my career and learning all the time: by doing, by asking questions and by working with others.</p>
+    <p>At Bemmel &amp; Kroon I grew from customer service and sales into building their software, and I'm studying Software Engineering next to that. I'm early in my career and learning all the time: by doing, by asking questions and by working with others.</p>
     <p>Outside work and school I mountain bike, play drums and there is pretty much always music on. I game, and I'm part of a few online gaming communities, which is how most of my client work started: websites and Discord bots for the communities I play in.</p>
     <p>And this is Banjer, head of quality assurance. Most of my bugs get solved on his walks.</p>
   </div>
