@@ -8,7 +8,7 @@ Engineering student from Leiden. This site shows what I make, mostly under
 
 | Address | What it is |
 | --- | --- |
-| [stinoo.dev](https://stinoo.dev) | The intro. A wall of my own code that types, recolors and draws my face out of glyphs. Press enter, or wait: after one pass it goes in by itself. |
+| [stinoo.dev](https://stinoo.dev) | The intro. A wall of my own code that types, recolors and draws my face out of glyphs. The bottom line shows how far it is (my code, hello, my face), then it opens my work by itself. "see my work" or enter goes there sooner. |
 | [stinoo.dev/site](https://stinoo.dev/site/) | The portfolio, opened like an editor: about me, projects, experience, my stack and color themes. Type `help` at the prompt for every command. |
 | [stinoo.dev/simple](https://stinoo.dev/simple/) | The same story as a plain, readable page, for anyone who would rather not drive a terminal. |
 
