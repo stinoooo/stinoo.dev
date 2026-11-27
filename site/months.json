@@ -1,7 +1,7 @@
 {
  "from": "2026-01-01",
  "to": "2026-11-27",
- "fetchedAt": "2026-11-27T15:38:20.942Z",
+ "fetchedAt": "2026-11-27T18:53:23.393Z",
  "scope": "GitHub-attributed public commit contributions per repository and month",
  "months": [
   {
@@ -118,6 +118,11 @@
    "month": "2026-11",
    "top": [
     {
+     "repo": "stinoo.dev",
+     "owner": "stinoooo",
+     "commits": 51
+    },
+    {
      "repo": "ArcJournal",
      "owner": "stinoooo",
      "commits": 13
@@ -133,9 +138,9 @@
      "commits": 3
     },
     {
-     "repo": "stinoo.dev",
+     "repo": "stinoooo",
      "owner": "stinoooo",
-     "commits": 1
+     "commits": 2
     }
    ]
   }
