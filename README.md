@@ -27,6 +27,9 @@ Engineering student from Leiden. This site shows what I make, mostly under
   first click or key press, and "sound on" in the header turns it off.
 - **A terminal you can type in.** The prompt at the end of every editor page takes commands
   (`help`, `vardoxen`, `theme paper`), and `:` opens the command line from anywhere.
+- **Search everything.** "search" in the header, `/`, Ctrl+K or ⌘K, or `:search rust` finds any
+  word across every project, case study, job, school, award, tool and theme. Picking a result
+  opens that page at once and marks the words on it ([`site/search.js`](site/search.js)).
 - **A terminal cursor.** With a mouse, the pointer is a block that snaps to the character grid
   and wraps whatever you can click ([`intros/shared/cursor.js`](intros/shared/cursor.js)).
 - **Small and fast.** One minified script per page, CSS inlined, fonts subset to WOFF2 (45 KB for
