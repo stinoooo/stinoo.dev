@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """Builds the intro's face layer from any short video of a face:  face.webm, face.mp4, face-track.json
 
-Reverse-engineered from hancore.dev (see ../../hancore-study/STUDY.md):
+How the intro uses it:
   * glimpse.js loadFace() fetches face.webm (vp9) or face.mp4 + face-track.json
   * makeCodeFace(): each video frame is shrunk to one pixel per glyph cell; luminance picks which glyph level to draw
   * makeTracking(): face-track.json = {fps, frames:[ [ [x,y]|null  x34 ] ... ]}  (normalised 0..1 in the cropped video, null = point lost)
     drawn as polylines, boxes and "['blob0:u'] ..." labels (a computer-vision debug look)
-  * The original's data matches Shi-Tomasi corners on frame 0 + Lucas-Kanade optical flow (30-34 of 34 points alive, median step ~0.003).
+  * Points are Shi-Tomasi corners on frame 0, followed with Lucas-Kanade optical flow.
 
 Usage (Python with opencv-python-headless + numpy; ffmpeg on PATH):
   python3 scripts/build-face.py --input me.mov --out . --crop 540x740+469+90 --start 3 [--key 0x3b5d2d]
 
-  --crop WxH+X+Y   crop of the source in pixels; keep roughly 0.73 aspect (the original is 430x590)
+  --crop WxH+X+Y   crop of the source in pixels; keep roughly 0.73 aspect (the intro uses 430x590)
   --start/--seconds  pick a calm 5 s window; the page loops it
   --key COLOUR     remove a green/blue-screen backdrop by hue (not colour distance, which eats dark skin) and put the person on black.
                    Without it the backdrop's brightness is painted as code too.
