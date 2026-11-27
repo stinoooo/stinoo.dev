@@ -1687,7 +1687,7 @@ const STEPS = [
   { label: "my face", ms: 13000 },
 ];
 const TOTAL_MS = STEPS.reduce((sum, item) => sum + item.ms, 0);
-const AUTO = { seconds: 3, deadline: TOTAL_MS * 2 + 10000, still: 8000 };
+const AUTO = { seconds: 3, deadline: TOTAL_MS + 20000, still: 8000 };
 const run = { step: 0, stepAt: 0, startedAt: 0, done: new Set(), shown: 0, finished: false, advancing: false, left: 0, hintUntil: 0, timer: 0 };
 
 function startRun() {
@@ -1832,7 +1832,7 @@ async function faceAct(alive) {
   if (tile && alive()) await until(() => !tile, alive, 1500);
   let at = null;
   for (let attempt = 0; attempt < 8 && !at && alive(); attempt++) {
-    at = calmNow() ? planFace() : null;
+    at = calmNow() ? planFace(attempt) : null;
     if (!at) await sleep(1200);
   }
   const started = Boolean(at) && (await runCommand("./face --track", alive)) && startBlock(at);
@@ -1855,7 +1855,7 @@ function layoutMessage(lines) {
   return { lines: placed, width: Math.max(...placed.map((line) => line.dx + line.text.length)) + 2, height: lines.length };
 }
 
-function chooseBlock(layout, my) {
+function chooseBlock(layout, my, minFill = 0.5) {
   const mx = Math.min(MSG_MX, Math.floor((wall.span[1] - wall.span[0] - 4 - layout.width) / 2));
   if (mx < 2) return null;
   let cols = layout.width + 2 * mx;
@@ -1878,7 +1878,7 @@ function chooseBlock(layout, my) {
     const seed = row + Math.floor(rows / 2);
     let filled = 0;
     for (let c = col; c < col + cols; c++) if (wall.chars[seed * wall.cols + c] !== " ") filled++;
-    if (filled < cols * 0.5) continue;
+    if (filled < cols * minFill) continue;
     if (keyboard?.fits && row + rows >= keyboard.topRow) continue;
     if (wall.fade[seed] < 0.8 || wall.fade[row] < 0.5 || wall.fade[row + rows - 1] < 0.5) continue;
     const x = cellX(col);
@@ -1903,11 +1903,14 @@ function showMachine(job) {
   blockFrame = requestAnimationFrame(blockStep);
 }
 
-function planFace() {
+// The face draws itself out of a line of code, so it looks for a well-filled one first. The code
+// holds still during the intro, so on a page of short lines it settles for a sparser one.
+function planFace(attempt = 0) {
   if (!face || !wall || leaving || tile || block || document.hidden) return null;
   const layout = layoutMessage(MESSAGES[1]);
+  const minFill = attempt < 2 ? 0.5 : attempt < 4 ? 0.2 : 0;
   for (let my = clamp(Math.floor((wall.band[1] - wall.band[0] - 6) / 2), 4, MSG_MY_FACE); my >= 4; my--) {
-    const at = chooseBlock(layout, my);
+    const at = chooseBlock(layout, my, minFill);
     if (at) return at;
   }
   return null;
@@ -4061,13 +4064,9 @@ window.addEventListener("pointermove", (event) => {
   pointer.lastMove = now;
   pointer.inside = true;
   if (isTouch) touch.lastAt = now;
-  else setHover(event.target === wallCanvas ? lineAt(event.clientX, event.clientY) : null);
-  if (!isTouch && pointer.travelled > 220 && canOpen(now)) {
-    pointer.travelled = 0;
-    open(now);
-  } else if (tile) {
-    loop();
-  }
+  // The intro plays straight through: hovering the code no longer highlights lines, opens previews
+  // or the eye. Only "see my work" (or enter) does something.
+  if (tile) loop();
 });
 
 window.addEventListener("pointerdown", (event) => {
@@ -4080,13 +4079,7 @@ window.addEventListener("pointerdown", (event) => {
   pointer.y = event.clientY;
   pointer.lastMove = now;
   pointer.inside = true;
-  askTilt();
-  if (event.target === wallCanvas && wall && !leaving && !drag) {
-    const pane = paneNear(Math.floor(event.clientX / CELL_W));
-    pane.scroll.target = pane.scroll.value;
-    pane.scroll.velocity = 0;
-    drag = { pane, id: event.pointerId, y: event.clientY, from: pane.scroll.value, at: now, moved: false, samples: [[now, event.clientY]] };
-  }
+  if (event.target === wallCanvas && wall && !leaving) introHint();
   if (tile) loop();
 });
 
@@ -4108,36 +4101,14 @@ window.addEventListener("pointercancel", (event) => {
   runScroll();
 });
 
+// A click on the code only points the way in.
 wallCanvas.addEventListener("click", (event) => {
   if (lastPointerType !== "mouse" || event.button !== 0 || leaving || !wall) return;
-  if (picker) {
-    pickerClick(event.clientX, event.clientY);
-    return;
-  }
-  const line = lineAt(event.clientX, event.clientY);
-  if (line) startObject(line);
-  else if (!inObject(Math.floor(event.clientX / CELL_W), Math.floor(event.clientY / CELL_H))) exitObject();
+  introHint();
 });
 
-window.addEventListener(
-  "wheel",
-  (event) => {
-    if (!wall || leaving || event.ctrlKey || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-    if (boot.active) finishBoot();
-    if (picker) {
-      event.preventDefault();
-      return;
-    }
-    event.preventDefault();
-    sfx.tick();
-    const pane = paneNear(clamp(Math.floor(event.clientX / CELL_W), 0, wall.cols - 1));
-    const rows = event.deltaMode === 1 ? event.deltaY : event.deltaMode === 2 ? event.deltaY * (wall.rows - 4) : event.deltaY / CELL_H;
-    pane.scroll.target += rows;
-    pane.scroll.response = event.deltaMode === 0 && Math.abs(event.deltaY) < 40 ? 0.14 : 0.3;
-    runScroll();
-  },
-  { passive: false },
-);
+// Scrolling does not move the code: the page has nothing to scroll, and the intro plays as it is.
+window.addEventListener("wheel", (event) => event.preventDefault(), { passive: false });
 
 function askTilt() {
   if (touch.asked) return;
@@ -4346,7 +4317,6 @@ function introHint() {
 
 document.addEventListener("keydown", (event) => {
   if (event.defaultPrevented) return;
-  if (boot.active && event.key !== "Enter") finishBoot();
   const active = document.activeElement;
   const free = !active || active === document.body || active === document.documentElement;
   if (picker && free) {
@@ -4368,23 +4338,13 @@ document.addEventListener("keydown", (event) => {
   if (!free || !wall || leaving || event.ctrlKey || event.metaKey || event.altKey) return;
   if ((event.key.length === 1 || event.key === "Backspace") && !event.isComposing) {
     event.preventDefault();
-    if (event.key === ":" && !visitorSession) {
-      pressKey(event.code, event.shiftKey);
-      openPicker();
-      return;
-    }
     // The wall is read-only: this page is only the intro. A key just clicks and points the way in.
     pressKey(event.code, event.shiftKey);
     introHint();
     return;
   }
-  const page = Math.max(1, wall.rows - 6);
-  const steps = { ArrowDown: 3, ArrowUp: -3, PageDown: page, PageUp: -page };
-  const edge = event.key === "Home" || event.key === "End" ? event.key : null;
-  if (!(event.key in steps) && !edge) return;
-  event.preventDefault();
-  const under = pointer.inside && pointer.x >= 0 ? paneNear(Math.floor(pointer.x / CELL_W)) : null;
-  for (const pane of under ? [under] : wall.panes) jumpPane(pane, steps[event.key] || 0, edge);
+  // Arrow keys and page keys don't scroll the code either.
+  if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)) event.preventDefault();
 });
 
 window.addEventListener("pageshow", (event) => {
