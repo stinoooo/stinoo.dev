@@ -574,8 +574,8 @@ export function createTerminal(buffer, options) {
     return mine === token;
   }
 
-  async function play(spec, mine) {
-    const instant = reduced.matches;
+  async function play(spec, mine, now = false) {
+    const instant = now || reduced.matches;
     if (!instant) onTyping?.(true);
     try {
       for (const block of spec.blocks) {
@@ -633,7 +633,8 @@ export function createTerminal(buffer, options) {
   }
 
   return {
-    show(spec) {
+    // { instant: true } draws the page at once, for a jump from search.
+    show(spec, { instant = false } = {}) {
       const mine = ++token;
       stopViewer();
       unmount();
@@ -647,7 +648,7 @@ export function createTerminal(buffer, options) {
         hero = spec.hero(host);
       }
       for (const out of spec.head || []) buffer.append(row(out.segments, out.className));
-      play(spec, mine);
+      play(spec, mine, instant);
       return hero;
     },
     zoom() {
