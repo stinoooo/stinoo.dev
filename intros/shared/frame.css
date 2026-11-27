@@ -224,3 +224,75 @@ button {
     bottom: 12px;
   }
 }
+
+/* the pointer as a terminal cursor (intros/shared/cursor.js), only with a mouse */
+.cursor-box,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.cursor-box {
+  border: 1px solid var(--accent, #e7c58a);
+  background: color-mix(in srgb, var(--accent, #e7c58a) 14%, transparent);
+  border-radius: 1px;
+  transition: opacity 0.15s, background-color 0.15s, border-radius 0.15s;
+}
+
+.cursor-dot {
+  width: 4px;
+  height: 4px;
+  background: var(--accent, #e7c58a);
+}
+
+html.cursor-on .cursor-box,
+html.cursor-on .cursor-dot {
+  opacity: 1;
+}
+
+html.cursor-on.has-cursor,
+html.cursor-on.has-cursor * {
+  cursor: none !important;
+}
+
+html.cursor-lock .cursor-box {
+  background: color-mix(in srgb, var(--accent, #e7c58a) 8%, transparent);
+  border-radius: 3px;
+  animation: cursor-lock 0.24s ease-out;
+}
+
+html.cursor-down .cursor-box {
+  background: color-mix(in srgb, var(--accent, #e7c58a) 30%, transparent);
+}
+
+html.cursor-text .cursor-box,
+html.cursor-text .cursor-dot {
+  opacity: 0;
+}
+
+html.cursor-on.has-cursor.cursor-text .t-input,
+html.cursor-on.has-cursor.cursor-text input {
+  cursor: text !important;
+}
+
+@keyframes cursor-lock {
+  0% {
+    outline: 1px solid var(--accent, #e7c58a);
+    outline-offset: 6px;
+  }
+  100% {
+    outline: 1px solid transparent;
+    outline-offset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.cursor-lock .cursor-box {
+    animation: none;
+  }
+}

@@ -1,5 +1,6 @@
 import { prefersStill, onWidthResize, rng } from "/intros/shared/common.js";
 import { sfx, soundToggle } from "/intros/shared/sfx.js";
+import { createCursor } from "/intros/shared/cursor.js";
 
 const FONT_PX = 12;
 const CELL_W = 7.2;
@@ -4161,6 +4162,7 @@ themeKey?.addEventListener("click", (event) => {
 });
 
 soundToggle(document.querySelector(".sound-toggle"));
+createCursor();
 
 enterLink?.addEventListener("click", (event) => {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
