@@ -113,7 +113,7 @@ ${head}
   <div>
     <p class="eyebrow">Leiden, the Netherlands</p>
     <h1>Hi, I'm Stijn Heemskerk.</h1>
-    <p class="intro">I'm a junior full stack software engineer at <strong>Bemmel &amp; Kroon</strong> and a Software Engineering student at <strong>The Hague University of Applied Sciences</strong>. I like making things all the way through: the code, but also the icon, the installer, the little sound when something works. Most of my own work ships under <a href="https://arcnode.dev">Arcnode</a>, my small studio.</p>
+    <p class="intro">I'm a junior full stack software engineer at <strong>Bemmel &amp; Kroon</strong> and a Software Engineering student at <strong>The Hague University</strong>. I like making things all the way through: the code, but also the icon, the installer, the little sound when something works. Most of my own work ships under <a href="https://arcnode.dev">Arcnode</a>, my small studio.</p>
     <p class="actions">
       <a class="button primary" href="#projects">See my projects</a>
       <a class="button" href="#contact">Get in touch</a>
