@@ -43,8 +43,8 @@ art.rows.slice(0, ROWS).forEach(([chars, colors], y) => {
   }
 });
 
-// 3. the four projects that matter most, as tags
-const tags = ["Arcnode", "Arcnode Remote", "Rosa Wildlife Reserve", "Vardoxen"];
+// 3. Arcnode, the name everything I make goes out under, as a tag
+const tags = ["Arcnode"];
 let tx = 72;
 const tagSvg = tags
   .map((t) => {
