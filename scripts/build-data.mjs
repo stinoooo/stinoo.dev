@@ -102,7 +102,27 @@ syncIdentity();
 // ---------- 2. Themes ----------
 const mixHex = (a, b, t) =>
   "#" + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t) + parseInt(b.slice(i, i + 2), 16) * t).toString(16).padStart(2, "0")).join("");
-const T = (name, description, light, bg, fg, accent, kw, str, num, fn, type, comment) => ({
+const luminance = (hex) => {
+  const [r, g, b] = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a, b) => {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+};
+// The dim text (comments, labels, hints) moves toward the text color until it reads at 4.6:1,
+// so every theme passes WCAG AA for normal text.
+const readable = (color, bg, fg) => {
+  for (let t = 0; t <= 1; t += 0.02) {
+    const mixed = mixHex(color, fg, t);
+    if (contrast(mixed, bg) >= 4.6) return mixed;
+  }
+  return fg;
+};
+const T = (name, description, light, bg, fg, accent, kw, str, num, fn, type, rawComment, comment = readable(rawComment, bg, fg)) => ({
   name,
   description,
   light,
@@ -113,7 +133,7 @@ const T = (name, description, light, bg, fg, accent, kw, str, num, fn, type, com
 });
 const THEME_DEFS = [
   T("Blackmoney", "Warm paper on near-black", false, "#0b0b0a", "#ebe6db", "#e7c58a", "#7fd1a0", "#e6c37a", "#f0885b", "#8fd0ee", "#c9a0e8", "#7a766a"),
-  T("Paper", "Light, ink on cream", true, "#f6f2e9", "#1d1c1a", "#b4532a", "#2f6f4f", "#8a5a1a", "#b4532a", "#2c5d8a", "#5a4a8a", "#8c887c"),
+  T("Paper", "Light, ink on cream", true, "#f6f2e9", "#1d1c1a", "#b4532a", "#2f6f4f", "#8a5a1a", "#a84d27", "#2c5d8a", "#5a4a8a", "#8c887c"),
   T("Sora", "Cool steel and teal", false, "#0b1015", "#d9e4ee", "#4cc9f0", "#4cc9f0", "#a9d6e5", "#ffa94d", "#9fb4ff", "#6ee7b7", "#56687a"),
   T("Circuit", "Board green, phosphor on black", false, "#07110c", "#d3f0dd", "#3ddc84", "#3ddc84", "#ffd166", "#ff8f70", "#59c3f0", "#c792ea", "#4d6b5a"),
   T("Amber", "Warm amber on ink", false, "#0e0c08", "#f1e6cc", "#f7931a", "#f7931a", "#e8d9a0", "#ff7a59", "#ffcf6b", "#9ad1d4", "#7a6a4a"),

@@ -19,11 +19,16 @@ function closeGate(withSound) {
     sessionStorage.setItem("stinoo.entered", "1");
   } catch {}
   sfx.set(withSound);
+  // The page behind the card comes back for keyboards and screen readers.
+  if (stage) stage.inert = false;
   node.classList.add("is-leaving");
   setTimeout(() => (node.hidden = true), 400);
 }
+const stage = document.querySelector("main.stage");
 if (gate) {
   gate.hidden = false;
+  // While the card is open, Tab and a screen reader stay on it.
+  if (stage) stage.inert = true;
   gate.querySelector(".gate-start").addEventListener("click", () => closeGate(true));
   gate.querySelector(".gate-quiet").addEventListener("click", () => closeGate(false));
   gate.querySelector(".gate-start").focus({ preventScroll: true });
