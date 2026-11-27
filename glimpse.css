@@ -322,3 +322,27 @@ body {
     right: 8px;
   }
 }
+
+/* a key press on the read-only intro points the way in */
+.note.is-hint {
+  color: var(--accent, var(--ink));
+}
+
+.enter.is-nudged {
+  animation: nudge 0.9s ease-in-out 2;
+}
+
+@keyframes nudge {
+  50% {
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 3px var(--accent, currentColor);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter.is-nudged {
+    animation: none;
+    outline: 2px solid var(--accent, currentColor);
+    outline-offset: 3px;
+  }
+}
