@@ -1,9 +1,10 @@
 import { createArchive } from "./archive.js";
-import { createWatch } from "./watch.js";
 import { createBar } from "./bar.js";
 import { createWheel } from "./wheel.js";
 import { createTerminal } from "./terminal.js";
-import { createBlueprint } from "./blueprint.js";
+import { createPortrait } from "./portrait.js";
+import { sfx, soundToggle } from "/intros/shared/sfx.js";
+import { createCursor } from "/intros/shared/cursor.js";
 import { createTips } from "./tip.js";
 import { createLightbox } from "./lightbox.js";
 
@@ -77,8 +78,7 @@ const chroma = (value) => Math.hypot(lab(value)[1], lab(value)[2]);
 const mix = (a, b, t) => `#${hex(a).map((v, n) => Math.round(v * (1 - t) + hex(b)[n] * t).toString(16).padStart(2, "0")).join("")}`;
 
 const DEFAULT_THEME = "blackmoney";
-const THEME_KEY = "portfolio.scheme";
-const WORM_KEY = "portfolio.worm";
+const THEME_KEY = "stinoo.scheme";
 let currentTheme = DEFAULT_THEME;
 let openEntry = null;
 let booted = false;
@@ -86,7 +86,19 @@ let cleanup = null;
 let typingToken = 0;
 let clearTimer = 0;
 let command = null;
-let watch = null;
+// The template's keyboard-and-eye layer is gone; its hooks now drive the interface sounds.
+const watch = {
+  pressChar: (ch) => sfx.key(ch),
+  pressKey: (code) => (code === "Enter" ? sfx.enter() : sfx.key()),
+  focus: () => {},
+  line: () => sfx.line(),
+  data: () => sfx.data(220),
+  slide: (manual) => (manual ? sfx.tick() : sfx.slide()),
+  recolor: () => {},
+  setText: () => {},
+};
+soundToggle($(".sound-toggle"));
+createCursor();
 let wheel = null;
 let hero = null;
 let typingBar = false;
@@ -139,18 +151,18 @@ const about = (() => {
 
 const MORE = new Set(content.more || []);
 const OMARCHY = new Set();
-const projectEntries = content.projects.map((project) => ({ id: project.repo, label: project.repo, kind: "project", data: project, parent: MORE.has(project.repo) ? "more" : OMARCHY.has(project.repo) ? "omarchy" : null }));
+const projectEntries = content.projects.map((project) => ({ id: project.repo, label: project.name || project.repo, kind: "project", data: project, parent: MORE.has(project.repo) ? "more" : OMARCHY.has(project.repo) ? "omarchy" : null }));
 const children = projectEntries.filter((entry) => entry.parent);
 const childrenOf = (id) => children.filter((entry) => entry.parent === id);
 const shipped = themes.filter((theme) => theme.included);
 const entries = [
-  { id: "about", label: "whoami", kind: "about", tile: "about" },
+  { id: "about", label: "about me", kind: "about", tile: "about" },
   ...projectEntries.filter((entry) => !entry.parent),
-  { id: "work", label: "work/", kind: "work", tile: "work" },
-  { id: "talks", label: "talks/", kind: "talks", tile: "talks" },
-  ...(childrenOf("more").length ? [{ id: "more", label: "more/", kind: "more" }] : []),
-  ...(stack ? [{ id: "stack", label: "stack/", kind: "stack", tile: "stack" }] : []),
-  { id: "themes", label: "themes/", kind: "themes", tile: "themes" },
+  { id: "work", label: "experience", kind: "work", tile: "work" },
+  ...(content.talks?.length ? [{ id: "talks", label: "talks/", kind: "talks", tile: "talks" }] : []),
+  ...(childrenOf("more").length ? [{ id: "more", label: "more projects", kind: "more" }] : []),
+  ...(stack ? [{ id: "stack", label: "tech stack", kind: "stack", tile: "stack" }] : []),
+  { id: "themes", label: "color themes", kind: "themes", tile: "themes" },
   ...children,
 ];
 const items = entries.filter((entry) => !entry.parent).map((entry) =>
@@ -174,7 +186,13 @@ function markSeen() {
     timer = setTimeout(() => {
       if (document.hidden) return;
       document.removeEventListener("visibilitychange", arm);
-      navigator.sendBeacon?.("/api/seen");
+      // one count per browser per half hour, shared by the intro and the editor; no cookies
+      let last = 0;
+      try {
+        last = Number(localStorage.getItem("stinoo.seen")) || 0;
+        if (Date.now() - last > 30 * 60e3) localStorage.setItem("stinoo.seen", String(Date.now()));
+      } catch {}
+      if (Date.now() - last > 30 * 60e3) navigator.sendBeacon?.("/api/seen");
     }, 1000);
   };
   document.addEventListener("visibilitychange", arm);
@@ -183,7 +201,7 @@ function markSeen() {
 document.addEventListener("visibilitychange", loadSeen);
 loadSeen();
 markSeen();
-const KEYS = { wide: "↑↓ project · ←→ shot · ↩ enter · : cmd", touch: "swipe the wheel · tap to open", closed: "tap ~/Projects ↓ to browse" };
+const KEYS = { wide: "click anything on the left, or use ↑ ↓ · ← → screenshots · :help for commands", touch: "swipe the list · tap to open", closed: "tap ~/Projects ↓ to see everything" };
 const paintKeys = () => bar.setKeys(narrow.matches ? (editor.classList.contains("is-tree-open") ? KEYS.touch : KEYS.closed) : matchMedia("(pointer: fine)").matches ? KEYS.wide : KEYS.touch);
 paintKeys();
 
@@ -191,8 +209,45 @@ function paintTyping() {
   bar.setTyping(typingBar || typingTerm);
 }
 
-const lightbox = createLightbox({ onOpen: () => tips.hide() });
+const lightbox = createLightbox({
+  onOpen: () => {
+    tips.hide();
+    sfx.open();
+  },
+});
+// The prompt at the end of every page is a real input: type "help", "vardoxen" or
+// "theme paper" and press enter, with or without the colon.
+function promptInput() {
+  const input = document.createElement("input");
+  input.className = "t-input";
+  input.type = "text";
+  input.spellcheck = false;
+  input.autocomplete = "off";
+  input.setAttribute("autocapitalize", "off");
+  input.setAttribute("enterkeyhint", "go");
+  input.setAttribute("aria-label", "Type a command, for example help");
+  input.placeholder = "type a command · try help";
+  input.addEventListener("input", (event) => {
+    if (event.inputType?.startsWith("insert")) sfx.key(event.data || "");
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const text = input.value.trim().replace(/^:/, "");
+      input.value = "";
+      sfx.enter();
+      if (text) run(text);
+    } else if (event.key === "Escape") {
+      input.value = "";
+      input.blur();
+      buffer.focus({ preventScroll: true });
+    }
+  });
+  return input;
+}
+
 const terminal = createTerminal(buffer, {
+  prompt: promptInput,
   lightbox,
   get watch() {
     return watch;
@@ -297,31 +352,39 @@ function room(used) {
   return Math.max(6, Math.min(GAUGE, chars - used));
 }
 
+const bare = (url) => url.replace(/^https:\/\//, "").replace(/\/$/, "");
+
 function projectSpec(project) {
-  const { share, note } = starShare(project.stars || 0);
-  const out = [
-    { segments: [[project.repo, "md-h md-h1"]] },
-    ...(project.description ? [{ segments: [project.description], className: "t-dim" }] : []),
+  const readme = [
+    { segments: [[project.name || project.repo, "md-h md-h1"]] },
+    ...(project.tag ? [{ segments: [[project.tag, "t-key"]] }] : []),
     { segments: [" "] },
-    fact("stars", project.stars, ["  ", ...gauge(share / 100, 17 + note.length), ...(note ? [[note, "t-dim"]] : [])]),
-    fact("forks", project.forks),
-    fact("watch", project.watchers),
-    fact("commits", project.commits),
-    ...Object.entries(project.counts || {}).map(([name, value]) => fact(name, value)),
-    fact("files", project.files),
-    { segments: [[pad("lang"), "t-key"], [project.language || "—", "md-code"], ...(project.license ? [["  " + project.license, "t-dim"]] : [])] },
-    { segments: [[pad("since"), "t-key"], project.created || "—", ["  pushed ", "t-dim"], project.pushed] },
+    { segments: [project.description] },
+    ...(project.long ? [{ segments: [" "] }, { segments: [project.long], className: "t-dim" }] : []),
+    ...(project.stack?.length ? [{ segments: [" "] }, { segments: [[pad("built"), "t-key"], project.stack.join(" · ")] }] : []),
   ];
-  const url = project.url;
+  const blocks = [{ cmd: "cat README.md", out: readme }];
+  if (project.github) {
+    blocks.push({
+      cmd: `gh repo view ${project.github.replace("https://github.com/", "")}`,
+      out: [
+        fact("stars", project.stars),
+        fact("forks", project.forks),
+        fact("commits", project.commits),
+        { segments: [[pad("lang"), "t-key"], [project.language || "—", "md-code"], ...(project.license && project.license !== "NOASSERTION" ? [["  " + project.license, "t-dim"]] : [])] },
+        { segments: [[pad("since"), "t-key"], project.created || "—", ["  pushed ", "t-dim"], project.pushed || "—"] },
+      ],
+    });
+  }
+  if (project.images.length) blocks.push({ cmd: "ls shots/", viewer: true });
+  for (const url of [project.url, ...(project.links || []).map((link) => link.url)].filter(Boolean)) {
+    blocks.push({ cmd: `open ${bare(url)}`, link: { text: bare(url), href: url } });
+  }
   return {
     cwd: `~/P/${project.repo}`,
-    branch: project.branch || "main",
+    branch: project.github ? project.branch || "main" : null,
     shots: project.images.map((image, index) => ({ ...image, repo: project.repo, file: image.file, name: image.label || fileLabel(image, index) })),
-    blocks: [
-      { cmd: `fetch ${project.repo}`, out },
-      { cmd: "ls shots/", viewer: true },
-      { cmd: `open ${url.replace(/^https:\/\//, "")}`, link: { text: url.replace(/^https:\/\//, ""), href: url } },
-    ],
+    blocks,
   };
 }
 
@@ -333,14 +396,8 @@ function aboutSpec() {
   return {
     cwd: "~",
     branch: null,
-    hero: (host) =>
-      createBlueprint(host, {
-        points: snapshot.contributions.total,
-        from: snapshot.contributions.from,
-        to: snapshot.contributions.to,
-        owner: about.name,
-        family: false,
-      }),
+    shots: [{ file: "shots/banjer.webp", repo: "banjer", name: "banjer.webp", alt: "Banjer, a curly brown dog in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" }],
+    hero: (host) => createPortrait(host, { onRow: (row) => row % 3 === 0 && sfx.line() }),
     blocks: [
       {
         cmd: "whoami",
@@ -349,15 +406,16 @@ function aboutSpec() {
         ],
       },
       {
-        cmd: `fetch ${about.name}`,
+        cmd: `gh api users/${about.name}`,
         out: [
-          fact("followers", snapshot.followers),
-          fact("stars", snapshot.stars.total, [[`  own ${fmt(snapshot.stars.own)} · marketplace ${fmt(snapshot.stars.marketplace)}`, "t-dim"]]),
-          fact("repos", snapshot.stars.repositoryCount),
           fact("contribs", snapshot.contributions.total, [[`  ${snapshot.contributions.from} → ${snapshot.contributions.to}`, "t-dim"]]),
+          fact("repos", stack?.repos ?? snapshot.stars.repositoryCount, [[`  ${fmt(snapshot.stars.repositoryCount)} of them public`, "t-dim"]]),
+          fact("stars", snapshot.stars.total),
         ],
       },
-      { cmd: "ls links/", out: [{ segments: about.links.flatMap((link, k) => [...(k ? ["   "] : []), [link.name, "", link.url]]) }] },
+      { cmd: "ls links/", out: [{ segments: about.links.flatMap((link, k) => [...(k ? ["   "] : []), [link.name, "", link.url]]) }, { segments: [["discord ", "t-key"], "bossmannn"], className: "t-dim" }] },
+      { cmd: "ls ~/banjer/", viewer: true },
+      { cmd: "cat ~/banjer/README", out: [{ segments: ["Banjer, head of quality assurance. Most of my bugs get solved on his walks. Very good at the beach, less good at code review."], className: "t-dim" }] },
       ...(stack ? [] : [calendarBlock()]),
     ],
   };
@@ -384,11 +442,11 @@ function stackSpec() {
       { cmd: "stack --languages", out: lang },
       {
         cmd: "stack --tools",
-        out: [...grid(stack.tools, 12), { segments: ["numbers: repos with evidence (files, topics, names)"], className: "t-dim" }],
+        out: [...grid(stack.tools, 12), { segments: ["numbers: projects on this site built with it"], className: "t-dim" }],
       },
-      ...(stack.ai?.length ? [{ cmd: "stack --ai-tools", out: [...grid(stack.ai, 12), { segments: ["listed by the owner"], className: "t-dim" }] }] : []),
       { cmd: "stack --site", out: stack.site.map((tool) => ({ segments: [{ icon: tool.icon, letter: tool.name }, " ", [tool.name.padEnd(20)], [tool.via, "t-dim"]] })) },
       calendarBlock(),
+      ...(stack.ai?.length ? [{ cmd: "stack --ai", out: stack.ai.map((tool) => ({ segments: [{ icon: tool.icon, letter: tool.name }, " ", [tool.name.padEnd(14)], [tool.via, "t-dim"]] })) }] : []),
     ],
   };
 }
@@ -411,7 +469,10 @@ function themesSpec() {
             viewport: buffer,
             lightbox,
             onPick(theme) {
-              if (applyTheme(theme.slug, true)) typeCmd(`:colorscheme ${key(theme.slug)}`);
+              if (applyTheme(theme.slug, true)) {
+                sfx.theme();
+                typeCmd(`:colorscheme ${key(theme.slug)}`);
+              }
             },
           });
           return archive.destroy;
@@ -448,20 +509,26 @@ function triptych(files) {
   });
 }
 
-const WHEN_W = 24;
-function workSpec() {
-  const list = content.work || [];
-  const jobs = list.filter((item) => item.kind !== "talk");
-  const out = list.filter((item) => item.kind !== "talk").flatMap((item) => [
+const WHEN_W = 20;
+const logRows = (list) =>
+  list.flatMap((item) => [
     { segments: [[item.when.padEnd(WHEN_W), "t-dim"], item.url ? [item.title, "", item.url] : [item.title, "t-key"], ...(item.org ? [["  @ " + item.org, "t-dim"]] : []), ...(item.where ? [["  · " + item.where, "t-dim"]] : [])] },
-    { segments: [[" ".repeat(WHEN_W)], [item.desc || ""]], className: "t-hang" },
+    ...(item.desc ? [{ segments: [[" ".repeat(WHEN_W)], [item.desc]], className: "t-hang" }] : []),
   ]);
+
+function workSpec() {
+  const all = content.work || [];
+  const jobs = all.filter((item) => item.type !== "internship");
+  const internships = all.filter((item) => item.type === "internship");
+  const section = (cmd, list) => (list.length ? [{ cmd, out: logRows(list) }] : []);
   return {
     cwd: "~/work",
     branch: null,
     blocks: [
-      { cmd: "fetch work/", out: [fact("entries", jobs.length), fact("programs", jobs.filter((item) => /summer of|google summer/i.test(item.title)).length)] },
-      { cmd: "git log --format='%ad  %s' work/", out },
+      ...section("git log work/", jobs),
+      ...section("git log internships/", internships),
+      ...section("ls school/", content.education || []),
+      ...section("cat achievements.txt", content.awards || []),
     ],
   };
 }
@@ -548,18 +615,20 @@ function textOf(entry) {
 function barView(entry) {
   if (entry.kind === "project") {
     const p = entry.data;
-    return [["STARS", fmt(p.stars)], ["FORKS", fmt(p.forks ?? 0)], ["WATCH", fmt(p.watchers ?? 0)]];
+    const kind = (p.tag || "").split(" · ")[0].toUpperCase();
+    return [["KIND", kind || "PROJECT"], ["WITH", (p.stack[0] || p.language || "—").toUpperCase()], p.github ? ["STARS", fmt(p.stars ?? 0)] : ["SOURCE", "PRIVATE"]];
   }
   if (entry.kind === "themes") return [["THEMES", String(themes.length)], ["BUILT-IN", String(themes.filter((theme) => theme.included).length)]];
-  if (entry.kind === "work") return [["ROLES", String((content.work || []).filter((item) => item.kind !== "talk").length)], ["SINCE", "2021"], ["NOW", "ALBY"]];
-  if (entry.kind === "talks") return [["TALKS", String((content.talks || []).length)], ["COUNTRIES", "4"], ["SINCE", "2022"]];
+  if (entry.kind === "work") return [["WORK", String((content.work || []).filter((item) => item.type !== "internship").length)], ["INTERNSHIPS", String((content.work || []).filter((item) => item.type === "internship").length)], ["AWARDS", String((content.awards || []).length)]];
+  if (entry.kind === "talks") return [["TALKS", String((content.talks || []).length)]];
   if (entry.kind === "more") return [["PROJECTS", String(childrenOf("more").length)]];
   if (entry.kind === "stack") return [["LANGS", String(stack.languages.length)], ["TOOLS", String(stack.tools.length)], ["AI", String(stack.ai?.length ?? 0)]];
-  return [["REPOS", fmt(snapshot.stars.repositoryCount)], ["STARS", fmt(snapshot.stars.total)], ["FOLLOWERS", fmt(snapshot.followers)]];
+  return [["CONTRIBS", fmt(snapshot.contributions.total)], ["REPOS", fmt(stack?.repos ?? snapshot.stars.repositoryCount)], ["STARS", fmt(snapshot.stars.total)]];
 }
 
 function open(entry) {
   if (entry === openEntry) return;
+  if (booted) sfx.select();
   if (cleanup) cleanup();
   cleanup = null;
   hero = null;
@@ -615,7 +684,73 @@ function open(entry) {
   }
 }
 
+// :help lists every command and key, so nobody has to guess what ":" does.
+function helpSpec() {
+  const cmd = (name, what, example = "") => ({ segments: [[`:${name}`.padEnd(22), "t-key"], what, ...(example ? [[`   e.g. :${example}`, "t-dim"]] : [])] });
+  const key = (keys, what) => ({ segments: [[keys.padEnd(22), "md-code"], what] });
+  const names = items.map((item) => item.entry.id).join(" · ");
+  return {
+    cwd: "~",
+    branch: null,
+    blocks: [
+      {
+        cmd: "help",
+        out: [
+          { segments: ["Type : anywhere to start a command, then press enter. Esc cancels."], className: "t-dim" },
+          { segments: [" "] },
+          cmd("e <name>", "open a page or a project", "e arcnode-remote"),
+          cmd("<name>", "the same, shorter", "vardoxen"),
+          cmd("theme", "pick a color theme"),
+          cmd("theme <name>", "switch to that theme", "theme paper"),
+          cmd("sound", "turn the sound on or off"),
+          cmd("simple", "open the simple version of this site"),
+          cmd("contact", "how to reach me"),
+          cmd("help", "this list"),
+          { segments: [["or type at the › prompt below, no colon needed · press / to jump there", "t-dim"]] },
+          cmd("q", "back to the intro"),
+          { segments: [" "] },
+          { segments: [["names    ", "t-key"], [names, "t-dim"]] },
+        ],
+      },
+      {
+        cmd: "help keys",
+        out: [
+          key("↑ ↓  or  j k", "move through the list on the left"),
+          key("enter", "open what is selected"),
+          key("← →  or  h l", "previous or next screenshot"),
+          key("space", "play a video, when there is one"),
+          key("tab", "jump between the list and the text"),
+          key("g  G", "top or bottom of the text"),
+          { segments: [" "] },
+          { segments: ["With a mouse: click anything in the list, scroll it like a dial, click a screenshot to enlarge it."], className: "t-dim" },
+        ],
+      },
+    ],
+  };
+}
+
+function showHelp() {
+  if (cleanup) cleanup();
+  cleanup = () => terminal.destroy();
+  hero = null;
+  openEntry = { id: "help", kind: "help" };
+  history.replaceState(null, "", "#help");
+  buffer.scrollTop = 0;
+  buffer.dataset.kind = "help";
+  winbar.textContent = "help — commands and keys";
+  tabFile.textContent = "/help";
+  bar.setView([["COMMANDS", "10"], ["KEYS", "7"]]);
+  terminal.show(helpSpec());
+  sfx.select();
+}
+
+function contact() {
+  goTo(entries.find((entry) => entry.kind === "about"));
+  say("contact: info@arcnode.dev · github.com/stinoooo · x.com/s_tinoo · discord bossmannn");
+}
+
 function openDrawer() {
+  sfx.open();
   editor.classList.add("is-tree-open");
   tabline.setAttribute("aria-expanded", "true");
   tabToggle.textContent = "↑";
@@ -624,6 +759,7 @@ function openDrawer() {
 }
 
 function closeDrawer() {
+  if (editor.classList.contains("is-tree-open")) sfx.close();
   editor.classList.remove("is-tree-open");
   tabline.setAttribute("aria-expanded", "false");
   tabToggle.textContent = "↓";
@@ -689,7 +825,11 @@ function schemes(name) {
 
 function scheme(name) {
   const found = schemes(name);
-  if (found.length === 1 && applyTheme(found[0], true)) return say(`:colorscheme ${found[0]}`);
+  if (found.length === 1 && applyTheme(found[0], true)) {
+    sfx.theme();
+    return say(`:colorscheme ${found[0]}`);
+  }
+  sfx.error();
   if (found.length > 1) return say(`E185: ${found.slice(0, 4).join(" · ")}${found.length > 4 ? " …" : ""}`);
   return say(`E185: Cannot find color scheme '${name}'`);
 }
@@ -698,6 +838,16 @@ function run(text) {
   const [name, ...rest] = text.trim().split(/\s+/);
   const arg = rest.join(" ");
   if (!name) return say("");
+  if (["help", "h", "?", "commands", "cmds"].includes(name.toLowerCase())) return showHelp();
+  if (name === "sound") {
+    sfx.set(!sfx.on);
+    return say(`sound ${sfx.on ? "on" : "off"}`);
+  }
+  if (name === "simple") {
+    location.href = "/simple/";
+    return;
+  }
+  if (name === "contact" || name === "email" || name === "mail") return contact();
   if (/^q(a|all)?!?$/.test(name) || name === "wq" || name === "x") {
     location.href = "/";
     return;
@@ -725,7 +875,8 @@ function run(text) {
     return goTo(entry);
   }
   if (!arg && schemes(name).length) return scheme(name);
-  return say(`E492: Not an editor command: ${text.trim()}`);
+  sfx.error();
+  return say(`E492: Not an editor command: ${text.trim()} · type :help for the list`);
 }
 
 function startCommand() {
@@ -764,6 +915,7 @@ function commandKey(event) {
 }
 
 document.addEventListener("keydown", (event) => {
+  if (event.target instanceof Element && event.target.closest(".t-input")) return;
   if (!event.repeat) watch?.pressKey(event.code, event.shiftKey);
   if (event.ctrlKey || event.metaKey || event.altKey || !booted) return;
   if (command !== null) {
@@ -771,6 +923,14 @@ document.addEventListener("keydown", (event) => {
     return;
   }
   const target = event.target instanceof Element ? event.target : null;
+  if (event.key === "/" && !event.repeat) {
+    const prompt = buffer.querySelector(".t-input");
+    if (prompt) {
+      event.preventDefault();
+      prompt.focus({ preventScroll: false });
+      return;
+    }
+  }
   if (target?.closest(".rack") || (target?.closest(".frame.is-xray") && ["Escape", "Enter", " "].includes(event.key))) return;
   if (event.key === ":") {
     event.preventDefault();
@@ -825,6 +985,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("hashchange", () => {
+  if (location.hash === "#help" && openEntry?.kind !== "help") return showHelp();
   const entry = entries.find((item) => item.id === decodeURIComponent(location.hash.slice(1)));
   if (entry && entry !== openEntry) goTo(entry);
 });
@@ -835,33 +996,13 @@ narrow.addEventListener("change", () => {
 });
 
 const tips = createTips();
-const family = { box: () => (openEntry?.kind === "about" && hero?.family?.()) || null, fire: (ms) => hero?.fire?.(ms) };
-const den = $(".den");
-let wormOn = false;
-try {
-  wormOn = localStorage.getItem(WORM_KEY) === "on";
-} catch {}
-const paintDen = () => {
-  den.setAttribute("aria-pressed", String(wormOn));
-  den.dataset.tip = wormOn ? "switch the worm off" : "wake the worm";
-};
-paintDen();
-den.addEventListener("click", () => {
-  wormOn = !wormOn;
-  paintDen();
-  watch?.setWorm(wormOn);
-  try {
-    if (wormOn) localStorage.setItem(WORM_KEY, "on");
-    else localStorage.removeItem(WORM_KEY);
-  } catch {}
-});
-watch = createWatch({ layer: $(".overlay"), deskHost: $(".desk"), eyeHost: $(".eye-host"), buffer, status: barHost, onState: (state) => bar.setState(state), family, den, wormOn });
 let saved = null;
 try {
   saved = localStorage.getItem(THEME_KEY);
 } catch {}
 applyTheme(saved && palettes.has(saved) ? saved : DEFAULT_THEME);
 
+const startHash = location.hash;
 const initialEntry = entries.find((entry) => entry.id === decodeURIComponent(location.hash.slice(1))) || entries[0];
 const initialItem = entries.find((entry) => entry.id === initialEntry.parent) || initialEntry;
 wheel = createWheel(wheelHost, {
@@ -871,7 +1012,8 @@ wheel = createWheel(wheelHost, {
   stack,
   initial: Math.max(0, items.findIndex((item) => item.entry === initialItem)),
   onChange(item) {
-    tabFile.textContent = `/${item.entry.kind === "project" ? item.entry.id : item.label}`;
+    if (booted) sfx.tick(items.indexOf(item));
+    tabFile.textContent = `/${item.entry.id}`;
   },
   onCommit(item) {
     if (!booted) return;
@@ -896,6 +1038,7 @@ if (moreAt >= 0)
 if (!reduced.matches) await typeCmd(":e ~/Projects", 18);
 wheelHost.classList.add("is-in");
 wheel.form();
+sfx.form(items.length);
 booted = true;
 child = initialEntry.parent ? initialEntry : null;
 wheel.commitNow();
@@ -904,3 +1047,4 @@ if (!openEntry) {
   const { item } = wheel.current();
   open(item.entry);
 }
+if (startHash === "#help") showHelp();

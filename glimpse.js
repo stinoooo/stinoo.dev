@@ -1,4 +1,6 @@
 import { prefersStill, onWidthResize, rng } from "/intros/shared/common.js";
+import { sfx, soundToggle } from "/intros/shared/sfx.js";
+import { createCursor } from "/intros/shared/cursor.js";
 
 const FONT_PX = 12;
 const CELL_W = 7.2;
@@ -18,8 +20,8 @@ const VANISH = [8, 28];
 const EDIT_ALPHA = 0.95;
 const MESSAGE_ALPHA = 0.97;
 const MESSAGES = [
-  ["i build", "the things", "i want to use."],
-  ["and make them", "feel like somewhere", "i want to be."],
+  ["i like making", "things all the", "way through."],
+  ["the code, the icon,", "the installer, and the", "little sound when", "something works."],
 ];
 const MSG_MX = 6;
 const MSG_MY = 6;
@@ -32,11 +34,11 @@ const KIND_TINT = { keyword: "keyword", string: "string", number: "number", func
 const KEYWORDS = new Set("import property readonly required default signal alias var let const function return if else for while do switch case break continue new delete typeof instanceof in of true false null undefined this root parent id on async await class extends static local then elseif end nil and or not repeat until struct enum typedef sizeof unsigned signed int long short char float double void bool static_assert goto extern inline export interface type def module require include extend self super yield try catch finally throw throws raise rescue ensure unless begin public private protected internal override virtual abstract namespace using fun val package object companion lambda with as from is elif except pass None True False nameof get set".split(" "));
 const COMMENT = { qml: "//", js: "//", c: "//", lua: "--", ruby: "#", shell: "#", python: "#", text: null };
 const MONO = { name: "", accent: "#ebe6db", bg: "#050505", fg: "#ebe6db", kinds: { keyword: "#ebe6db", string: "#ebe6db", number: "#ebe6db", function: "#ebe6db", type: "#ebe6db", comment: "#ebe6db", text: "#ebe6db" } };
-const NOTE_TEXT = "// systems, developer tools, open source.";
+const NOTE_TEXT = "// intro · Stijn Heemskerk, junior full stack engineer";
 const touchMode = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 // Bump when face.webm / face.mp4 / face-track.json / wall.json change. These files are fetched by script, and browsers can keep old copies of
 // script-initiated fetches even through a hard refresh; a new ?v= makes the old cache entries unreachable.
-const ASSET_V = "20261123-orig-face";
+const ASSET_V = "dev";
 const FACE_FONT_PX = 5.5;
 const EM_TOP = 1025 / 1300;
 const GLYPH_Y = 1 + FONT_PX * EM_TOP;
@@ -1530,6 +1532,7 @@ async function ghostUndo(token) {
 async function ghostColors(token) {
   const alive = () => token === ghost.token;
   if (!visit.theme.name || !wall) return;
+  sfx.theme();
   ghost.act = true;
   if (!(await cmdType(`:colorscheme ${visit.theme.name}`, alive))) return;
   const pane = wall.panes[0];
@@ -1598,7 +1601,45 @@ async function runCycle() {
   const token = ++director.token;
   const alive = () => token === director.token && !leaving;
   const ok = (await workAct(alive)) && (await sayAct(alive)) && (await faceAct(alive));
+  if (ok && alive() && !autoTried) {
+    autoTried = true;
+    if (await autoAdvance()) return;
+  }
   if (alive()) scheduleCycle(ok ? between(...CYCLE.pause) : CYCLE.retry);
+}
+
+// After one full pass (code, both lines, the face) the intro moves on by itself, with a short
+// countdown on the bottom line. Any key, click, scroll or mouse movement cancels it, and the
+// intro keeps playing for whoever is still watching.
+const AUTO = { seconds: 3, quiet: 2500 };
+let autoTried = false;
+let lastInput = performance.now();
+for (const type of ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"])
+  window.addEventListener(type, () => (lastInput = performance.now()), { capture: true, passive: true });
+
+async function autoAdvance() {
+  if (leaving || picker || object || visitorSession || !enterLink || !noteLine) return false;
+  if (performance.now() - lastInput < AUTO.quiet) return false;
+  const started = performance.now();
+  const cancelled = () => lastInput > started || leaving || picker || document.hidden;
+  enterLink.classList.add("is-nudged");
+  noteLine.classList.add("is-hint");
+  for (let left = AUTO.seconds; left > 0; left--) {
+    noteLine.textContent = `// opening my work in ${left}… · press esc to stay`;
+    sfx.tick(AUTO.seconds - left);
+    for (let k = 0; k < 10; k++) {
+      await sleep(100);
+      if (cancelled()) {
+        enterLink.classList.remove("is-nudged");
+        noteLine.classList.remove("is-hint");
+        noteLine.textContent = leaving ? noteLine.textContent : NOTE_TEXT;
+        return false;
+      }
+    }
+  }
+  enterLink.classList.remove("is-nudged");
+  leave(enterLink.href);
+  return true;
 }
 
 async function workAct(alive) {
@@ -1782,11 +1823,13 @@ function sceneStep(now, dt) {
   if (block.phase === "seed" && now - block.start >= SEED_MS) {
     block.phase = "grow";
     block.grow.target = 1;
+    sfx.scan();
   }
   const settled = advance(block.grow, dt);
   if (block.phase === "grow" && (settled || block.grow.value > 0.985)) {
     block.phase = "hold";
     block.holdUntil = now + block.holdMs;
+    sfx.lock();
   } else if (block.phase === "hold" && now >= block.holdUntil) {
     retractBlock();
   } else if (block.phase === "shrink" && block.grow.value < 0.01) {
@@ -1805,6 +1848,7 @@ function retractBlock() {
   }
   if (block.phase === "shrink") return;
   block.phase = "shrink";
+  sfx.close();
   block.grow.target = 0;
   block.grow.response = 0.36;
 }
@@ -2274,6 +2318,7 @@ function focusPoint(now) {
 
 function open(now, chosen = chooseTile()) {
   if (!chosen) return false;
+  sfx.iris();
   tile = {
     ...chosen,
     cx: chosen.x + chosen.w / 2,
@@ -2311,6 +2356,7 @@ function open(now, chosen = chooseTile()) {
 
 function close(now) {
   if (!tile || tile.state === "closing" || tile.leaving) return;
+  sfx.close();
   if (prefersStill() || tile.state === "seed") {
     const region = tile;
     tile = null;
@@ -2576,6 +2622,7 @@ function reach(hand, finger, key, now, hold) {
 }
 
 function pressKey(code, shift = false) {
+  if (!leaving) code === "Enter" ? sfx.enter() : sfx.key(code === "Space" ? " " : code);
   if (!wall || !keyboard?.fits || leaving) return;
   const key = keyboard.keys.get(code);
   if (!key) return;
@@ -3114,6 +3161,7 @@ function showPickerTheme() {
   }
   closeNow();
   abortBlock();
+  sfx.theme();
   useTheme(theme);
   renderWall();
 }
@@ -3125,6 +3173,7 @@ function refreshPicker() {
 }
 
 function openPicker() {
+  sfx.open();
   if (!wall || leaving || picker) return;
   if (document.activeElement && document.activeElement !== document.body) document.activeElement.blur();
   abortGhost();
@@ -3532,6 +3581,7 @@ function objectClear({ r0, c0, w, h }) {
 function startObject(line, run = 0) {
   if (!line || !wall || leaving || !objectKind(line.file)) return false;
   endObject();
+  sfx.open();
   if (ghost.act && !ghost.terminal && !touchMode) abortGhost();
   const region = objectRegion(line);
   if (!region || !objectClear(region)) return false;
@@ -3924,6 +3974,7 @@ window.addEventListener(
       return;
     }
     event.preventDefault();
+    sfx.tick();
     const pane = paneNear(clamp(Math.floor(event.clientX / CELL_W), 0, wall.cols - 1));
     const rows = event.deltaMode === 1 ? event.deltaY : event.deltaMode === 2 ? event.deltaY * (wall.rows - 4) : event.deltaY / CELL_H;
     pane.scroll.target += rows;
@@ -4052,6 +4103,7 @@ function zoomInto() {
 
 async function leave(href) {
   if (leaving) return;
+  sfx.enter();
   leaving = true;
   if (prefersStill() || !wall) {
     window.location.href = href;
@@ -4093,8 +4145,13 @@ async function leave(href) {
     }
   }
   flushDirty();
+  // the exit in sound: the iris opened above, now the wall dissolves, then the pull into the circle
+  sfx.dissolve(0.7);
   await sleep(700);
-  if (tile) await zoomInto();
+  if (tile) {
+    sfx.dive(DIVE.ms / 1000);
+    await zoomInto();
+  }
   window.location.href = href;
 }
 
@@ -4104,11 +4161,28 @@ themeKey?.addEventListener("click", (event) => {
   else openPicker();
 });
 
+soundToggle(document.querySelector(".sound-toggle"));
+createCursor();
+
 enterLink?.addEventListener("click", (event) => {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   leave(enterLink.href);
 });
+
+let hintTimer = 0;
+function introHint() {
+  if (!noteLine) return;
+  clearTimeout(hintTimer);
+  noteLine.textContent = "// this is just the intro: press enter to see my work";
+  noteLine.classList.add("is-hint");
+  enterLink?.classList.add("is-nudged");
+  hintTimer = setTimeout(() => {
+    noteLine.classList.remove("is-hint");
+    enterLink?.classList.remove("is-nudged");
+    noteLine.textContent = NOTE_TEXT;
+  }, 3200);
+}
 
 document.addEventListener("keydown", (event) => {
   if (event.defaultPrevented) return;
@@ -4139,7 +4213,9 @@ document.addEventListener("keydown", (event) => {
       openPicker();
       return;
     }
-    visitorKey(event);
+    // The wall is read-only: this page is only the intro. A key just clicks and points the way in.
+    pressKey(event.code, event.shiftKey);
+    introHint();
     return;
   }
   const page = Math.max(1, wall.rows - 6);
@@ -4193,7 +4269,13 @@ function markSeen() {
     timer = setTimeout(() => {
       if (document.hidden) return;
       document.removeEventListener("visibilitychange", arm);
-      navigator.sendBeacon?.("/api/seen");
+      // one count per browser per half hour, shared by the intro and the editor; no cookies
+      let last = 0;
+      try {
+        last = Number(localStorage.getItem("stinoo.seen")) || 0;
+        if (Date.now() - last > 30 * 60e3) localStorage.setItem("stinoo.seen", String(Date.now()));
+      } catch {}
+      if (Date.now() - last > 30 * 60e3) navigator.sendBeacon?.("/api/seen");
     }, 1000);
   };
   document.addEventListener("visibilitychange", arm);
@@ -4243,6 +4325,10 @@ navigator.keyboard
     if (wall) layoutKeyboard();
   })
   .catch(() => {});
-loadFace().then((loaded) => {
-  face = loaded;
-});
+// The face is my profile picture: scripts/face-from-photo.py animates the still and
+// scripts/build-face.py turns that clip into face.webm + face-track.json.
+const HAS_FACE = true;
+if (HAS_FACE)
+  loadFace().then((loaded) => {
+    face = loaded;
+  });

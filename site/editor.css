@@ -15,7 +15,7 @@ body {
   --cell-h: 13px;
   --margin: 64px;
   --wide: 1008px;
-  --desk-h: 184px;
+  --desk-h: 0px;
   --bar-h: 46px;
   --eye-w: 216px;
   transition: background-color 420ms cubic-bezier(0.23, 1, 0.32, 1), color 420ms cubic-bezier(0.23, 1, 0.32, 1);
@@ -1925,4 +1925,112 @@ a.md-link:hover {
 .term-shot .frame:hover img,
 .term-shot .frame:focus-within img {
   filter: none;
+}
+
+/* about: the portrait from my GitHub card beside a neofetch-style list */
+.wave.fetch {
+  display: flex;
+  gap: calc(3 * var(--cell-w));
+  align-items: flex-start;
+  height: auto;
+  overflow: visible;
+  pointer-events: auto;
+  margin-top: var(--cell-h);
+}
+
+.wave.fetch .fetch-art {
+  position: static;
+  inset: auto;
+  flex: none;
+  display: block;
+  width: min(365px, 46%);
+  height: auto;
+  user-select: none;
+}
+
+.fetch-side {
+  min-width: 0;
+  font: 400 12px/1.5 "Plex Mono", ui-monospace, monospace;
+}
+
+.fetch-side p,
+.fetch-list,
+.fetch-list dd {
+  margin: 0;
+}
+
+.fetch-rule {
+  color: var(--dim);
+}
+
+.fetch-list div {
+  display: flex;
+  gap: 1ch;
+}
+
+.fetch-list dt {
+  flex: none;
+  width: 9ch;
+}
+
+.fetch-list dd {
+  min-width: 0;
+}
+
+.fetch-swatch {
+  display: flex;
+  margin-top: 6px !important;
+}
+
+.fetch-swatch i {
+  width: 3ch;
+  height: 1.1em;
+}
+
+.fetch-swatch i:nth-child(1) { background: var(--color1); }
+.fetch-swatch i:nth-child(2) { background: var(--color2); }
+.fetch-swatch i:nth-child(3) { background: var(--color3); }
+.fetch-swatch i:nth-child(4) { background: var(--color4); }
+.fetch-swatch i:nth-child(5) { background: var(--color5); }
+.fetch-swatch i:nth-child(6) { background: var(--color6); }
+.fetch-swatch i:nth-child(7) { background: var(--color7); }
+.fetch-swatch i:nth-child(8) { background: var(--color8); }
+
+@media (max-width: 700px) {
+  .wave.fetch {
+    flex-direction: column;
+    gap: var(--cell-h);
+    height: auto;
+  }
+
+  .wave.fetch .fetch-art {
+    width: min(100%, 340px);
+  }
+
+  .fetch-side {
+    font-size: 11px;
+  }
+}
+
+/* the prompt at the end of every page takes typed commands */
+.t-input {
+  width: calc(100% - 3ch);
+  min-width: 12ch;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  caret-color: var(--accent);
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.t-input::placeholder {
+  color: var(--dim);
+  opacity: 1;
+}
+
+.t-input:focus::placeholder {
+  color: transparent;
 }

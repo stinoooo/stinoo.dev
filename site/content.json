@@ -1,29 +1,29 @@
 {
- "owner": "alexrivera",
- "fetchedAt": "2026-11-25T09:11:39.315Z",
+ "owner": "stinoooo",
+ "fetchedAt": "2026-11-27T15:50:02.358Z",
  "about": {
-  "repo": "alexrivera",
+  "repo": "stinoooo",
   "lines": [
-   "# Alex Rivera",
+   "# Stijn Heemskerk",
    "",
-   "Systems and full-stack engineer building developer tools, distributed storage engines, and open-source software.",
+   "Junior full stack software engineer at Bemmel & Kroon and Software Engineering student at The Hague University of Applied Sciences, from Leiden. I like making things all the way through: the code, but also the icon, the installer, the little sound when something works. Most of my own work ships under Arcnode, my small studio for my own projects and the occasional client. Away from the keyboard I mountain bike, play drums, and there is pretty much always music on.",
    "",
-   "San Francisco · Open Source",
-   "",
-   "[GitHub](https://github.com/alexrivera)",
-   "[LinkedIn](https://www.linkedin.com/in/alexrivera)",
-   "[X / Twitter](https://x.com/alexrivera)",
-   "[Blog](https://alexrivera.dev/blog)"
+   "[GitHub](https://github.com/stinoooo)",
+   "[X](https://x.com/s_tinoo)",
+   "[Arcnode](https://arcnode.dev)"
   ]
  },
  "projects": [
   {
-   "repo": "pulsedb",
-   "url": "https://github.com/alexrivera/pulsedb",
-   "description": "An embedded time-series storage engine written in Rust with sub-millisecond range queries and vectorized compression.",
-   "tag": "Database · Rust",
+   "repo": "arcnode",
+   "name": "Arcnode",
+   "long": "One Turborepo monorepo for the website, Backboard (the OAuth 2.0 and OpenID Connect account service every Arcnode app signs in with), the game API, the relay for Arcnode Remote, the status page and the community bot. Deployed on Vercel and Railway.",
+   "links": [],
+   "url": "https://arcnode.dev",
+   "description": "My studio: projects, downloads, a client portal and the sign-in service behind every app.",
+   "tag": "Studio · Monorepo",
    "stars": null,
-   "language": "Rust",
+   "language": "Next.js",
    "pushed": null,
    "forks": null,
    "watchers": null,
@@ -34,44 +34,117 @@
    "commits": null,
    "files": null,
    "counts": {},
-   "github": "https://github.com/alexrivera/pulsedb",
+   "github": null,
    "stack": [
+    "Next.js",
+    "Hono",
+    "PostgreSQL",
+    "Turborepo"
+   ],
+   "images": [
+    {
+     "file": "shots/arcnode.webp",
+     "source": "shots/arcnode.webp",
+     "alt": "Arcnode screenshot 1",
+     "xray": false
+    }
+   ],
+   "lines": [
+    "# Arcnode",
+    "",
+    "\u0001IMG0\u0001",
+    "",
+    "### My studio: projects, downloads, a client portal and the sign-in service behind every app.",
+    "",
+    "One Turborepo monorepo for the website, Backboard (the OAuth 2.0 and OpenID",
+    "Connect account service every Arcnode app signs in with), the game API, the",
+    "relay for Arcnode Remote, the status page and the community bot. Deployed on",
+    "Vercel and Railway.",
+    "",
+    "Built with Next.js · Hono · PostgreSQL · Turborepo",
+    "",
+    "[Visit](https://arcnode.dev)"
+   ]
+  },
+  {
+   "repo": "arcnode-remote",
+   "name": "Arcnode Remote",
+   "long": "Help anyone over the internet with a one-time code. The person at the computer sees who is helping (confirmed by Arcnode), compares a six-digit code and can disconnect at any moment. Sessions are end-to-end encrypted with Noise XX and go through the Arcnode relay over TLS 1.3. View only or full control, every screen at once, chat, file transfer and any-time access.",
+   "links": [],
+   "url": "https://arcnode.dev/projects/arcnode-remote",
+   "description": "Remote support for Windows, end-to-end encrypted, on the other person's terms.",
+   "tag": "Desktop · Tauri + Rust",
+   "stars": null,
+   "language": "Tauri",
+   "pushed": null,
+   "forks": null,
+   "watchers": null,
+   "issues": null,
+   "license": null,
+   "created": null,
+   "branch": "main",
+   "commits": null,
+   "files": null,
+   "counts": {},
+   "github": null,
+   "stack": [
+    "Tauri",
     "Rust",
-    "SQLite",
-    "WebAssembly",
+    "React",
     "TypeScript"
    ],
    "images": [
     {
-     "file": "shots/project-1.svg",
-     "source": "shots/project-1.svg",
-     "alt": "PulseDB screenshot 1",
+     "file": "shots/arcnode-remote.webp",
+     "source": "shots/arcnode-remote.webp",
+     "alt": "Arcnode Remote screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/arcnode-remote-2.webp",
+     "source": "shots/arcnode-remote-2.webp",
+     "alt": "Arcnode Remote screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/arcnode-remote-3.webp",
+     "source": "shots/arcnode-remote-3.webp",
+     "alt": "Arcnode Remote screenshot 3",
      "xray": false
     }
    ],
    "lines": [
-    "# PulseDB",
+    "# Arcnode Remote",
     "",
     "\u0001IMG0\u0001",
     "",
-    "### An embedded time-series storage engine written in Rust with sub-millisecond range queries and vectorized compression.",
+    "### Remote support for Windows, end-to-end encrypted, on the other person's terms.",
     "",
-    "PulseDB is a lightweight embedded time-series database designed for edge",
-    "telemetry and local developer metrics. It features gorilla-style delta",
-    "encoding, memory-mapped segment files, and a zero-allocation query iterator.",
+    "Help anyone over the internet with a one-time code. The person at the",
+    "computer sees who is helping (confirmed by Arcnode), compares a six-digit",
+    "code and can disconnect at any moment. Sessions are end-to-end encrypted",
+    "with Noise XX and go through the Arcnode relay over TLS 1.3. View only or",
+    "full control, every screen at once, chat, file transfer and any-time access.",
     "",
-    "Built with Rust · SQLite · WebAssembly · TypeScript",
+    "Built with Tauri · Rust · React · TypeScript",
     "",
-    "[Visit](https://github.com/alexrivera/pulsedb)"
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "[Visit](https://arcnode.dev/projects/arcnode-remote)"
    ]
   },
   {
-   "repo": "termflow",
-   "url": "https://github.com/alexrivera/termflow",
-   "description": "A fast terminal multiplexer and task runner with live dependency graphs and structured log filtering.",
-   "tag": "CLI · Go",
+   "repo": "rosa-wildlife-reserve",
+   "name": "Rosa Wildlife Reserve",
+   "long": "rosarealism.com with a member dashboard, five Discord bots (applications, tickets, player progress, voice) and a desktop app for staff, all in one monorepo on a shared PostgreSQL database that talks to the game server, with tests and releases on GitHub.",
+   "links": [],
+   "url": "https://rosarealism.com",
+   "description": "The website and five Discord bots behind a Path of Titans realism server.",
+   "tag": "Client · Web + Discord",
    "stars": null,
-   "language": "Go",
+   "language": "Next.js",
    "pushed": null,
    "forks": null,
    "watchers": null,
@@ -82,44 +155,66 @@
    "commits": null,
    "files": null,
    "counts": {},
-   "github": "https://github.com/alexrivera/termflow",
+   "github": null,
    "stack": [
-    "Go",
-    "Terminal",
-    "Docker",
-    "Linux"
+    "Next.js",
+    "TypeScript",
+    "discord.js",
+    "Electron",
+    "Prisma",
+    "PostgreSQL"
    ],
    "images": [
     {
-     "file": "shots/project-2.svg",
-     "source": "shots/project-2.svg",
-     "alt": "TermFlow screenshot 1",
+     "file": "shots/rosa.webp",
+     "source": "shots/rosa.webp",
+     "alt": "Rosa Wildlife Reserve screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/rosa-2.webp",
+     "source": "shots/rosa-2.webp",
+     "alt": "Rosa Wildlife Reserve screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/rosa-3.webp",
+     "source": "shots/rosa-3.webp",
+     "alt": "Rosa Wildlife Reserve screenshot 3",
      "xray": false
     }
    ],
    "lines": [
-    "# TermFlow",
+    "# Rosa Wildlife Reserve",
     "",
     "\u0001IMG0\u0001",
     "",
-    "### A fast terminal multiplexer and task runner with live dependency graphs and structured log filtering.",
+    "### The website and five Discord bots behind a Path of Titans realism server.",
     "",
-    "TermFlow orchestrates local microservices and build pipelines from a single",
-    "declarative manifest. It streams colorized output, detects port conflicts",
-    "automatically, and exports execution timelines.",
+    "rosarealism.com with a member dashboard, five Discord bots (applications,",
+    "tickets, player progress, voice) and a desktop app for staff, all in one",
+    "monorepo on a shared PostgreSQL database that talks to the game server, with",
+    "tests and releases on GitHub.",
     "",
-    "Built with Go · Terminal · Docker · Linux",
+    "Built with Next.js · TypeScript · discord.js · Electron · Prisma · PostgreSQL",
     "",
-    "[Visit](https://github.com/alexrivera/termflow)"
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "[Visit](https://rosarealism.com)"
    ]
   },
   {
-   "repo": "tracekit",
-   "url": "https://github.com/alexrivera/tracekit",
-   "description": "Zero-overhead OpenTelemetry trace viewer that runs entirely in the browser from JSONL trace dumps.",
-   "tag": "Observability · TypeScript",
+   "repo": "vardoxen",
+   "name": "Vardoxen",
+   "long": "vardoxen.tv and the Citadel Discord bot on one shared database: Discord sign-in, moderated anonymous submissions, giveaways, supporter pages, live alerts and a role-based admin dashboard. The bot is written in Python.",
+   "links": [],
+   "url": "https://vardoxen.tv",
+   "description": "The website and Discord bot behind streamer Vardoxen's community.",
+   "tag": "Client · Web + Discord",
    "stars": null,
-   "language": "TypeScript",
+   "language": "Next.js",
    "pushed": null,
    "forks": null,
    "watchers": null,
@@ -130,142 +225,533 @@
    "commits": null,
    "files": null,
    "counts": {},
-   "github": "https://github.com/alexrivera/tracekit",
+   "github": null,
+   "stack": [
+    "Next.js",
+    "TypeScript",
+    "Prisma",
+    "PostgreSQL",
+    "Python",
+    "discord.py"
+   ],
+   "images": [
+    {
+     "file": "shots/vardoxen.webp",
+     "source": "shots/vardoxen.webp",
+     "alt": "Vardoxen screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/vardoxen-2.webp",
+     "source": "shots/vardoxen-2.webp",
+     "alt": "Vardoxen screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/vardoxen-3.webp",
+     "source": "shots/vardoxen-3.webp",
+     "alt": "Vardoxen screenshot 3",
+     "xray": false
+    }
+   ],
+   "lines": [
+    "# Vardoxen",
+    "",
+    "\u0001IMG0\u0001",
+    "",
+    "### The website and Discord bot behind streamer Vardoxen's community.",
+    "",
+    "vardoxen.tv and the Citadel Discord bot on one shared database: Discord",
+    "sign-in, moderated anonymous submissions, giveaways, supporter pages, live",
+    "alerts and a role-based admin dashboard. The bot is written in Python.",
+    "",
+    "Built with Next.js · TypeScript · Prisma · PostgreSQL · Python · discord.py",
+    "",
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "[Visit](https://vardoxen.tv)"
+   ]
+  },
+  {
+   "repo": "bemmel-and-kroon-scheduling",
+   "name": "Bemmel & Kroon Scheduling",
+   "long": "An internal web app where staff, team leads and management handle rosters, absence and staff planning. It started in PHP and MySQL in 2025 and grew into a Next.js platform with Excel and calendar export, email notifications and an installable PWA. The screenshots use made-up names.",
+   "links": [],
+   "url": "https://arcnode.dev/projects/bemmel-kroon-werkplanning",
+   "description": "Rosters, absence and staff planning for Bemmel & Kroon, with rights per role.",
+   "tag": "Work · Web app",
+   "stars": null,
+   "language": "Next.js",
+   "pushed": null,
+   "forks": null,
+   "watchers": null,
+   "issues": null,
+   "license": null,
+   "created": null,
+   "branch": "main",
+   "commits": null,
+   "files": null,
+   "counts": {},
+   "github": null,
+   "stack": [
+    "Next.js",
+    "TypeScript",
+    "MongoDB",
+    "Tailwind CSS",
+    "Zod"
+   ],
+   "images": [
+    {
+     "file": "shots/bemmel.webp",
+     "source": "shots/bemmel.webp",
+     "alt": "Bemmel & Kroon Scheduling screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/bemmel-2.webp",
+     "source": "shots/bemmel-2.webp",
+     "alt": "Bemmel & Kroon Scheduling screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/bemmel-3.webp",
+     "source": "shots/bemmel-3.webp",
+     "alt": "Bemmel & Kroon Scheduling screenshot 3",
+     "xray": false
+    }
+   ],
+   "lines": [
+    "# Bemmel & Kroon Scheduling",
+    "",
+    "\u0001IMG0\u0001",
+    "",
+    "### Rosters, absence and staff planning for Bemmel & Kroon, with rights per role.",
+    "",
+    "An internal web app where staff, team leads and management handle rosters,",
+    "absence and staff planning. It started in PHP and MySQL in 2025 and grew",
+    "into a Next.js platform with Excel and calendar export, email notifications",
+    "and an installable PWA. The screenshots use made-up names.",
+    "",
+    "Built with Next.js · TypeScript · MongoDB · Tailwind CSS · Zod",
+    "",
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "[Visit](https://arcnode.dev/projects/bemmel-kroon-werkplanning)"
+   ]
+  },
+  {
+   "repo": "exit-only",
+   "name": "Exit Only",
+   "long": "The police only know where you are while someone can see you: break every line of sight around corners, through traffic and under the Plaza Tunnel, and stay out of the helicopter searchlight until they give up. Every run builds a different city with its own closures, hour, weather and traffic. Crashes leave dents and glass on the road, the car drives with gears and real grip, and Rooftop Rush adds a sliding-vehicle puzzle on a gridlocked parking deck. Every car, building and sound is made in-house. Free on Arcnode Games.",
+   "links": [],
+   "url": "https://arcnode.dev/projects/exit-only",
+   "description": "A 3D police chase through a rainy night city that changes every run.",
+   "tag": "Game · Godot",
+   "stars": null,
+   "language": "Godot",
+   "pushed": null,
+   "forks": null,
+   "watchers": null,
+   "issues": null,
+   "license": null,
+   "created": null,
+   "branch": "main",
+   "commits": null,
+   "files": null,
+   "counts": {},
+   "github": null,
+   "stack": [
+    "Godot",
+    "GDScript",
+    "Blender",
+    "Python"
+   ],
+   "images": [
+    {
+     "file": "shots/exit-only.webp",
+     "source": "shots/exit-only.webp",
+     "alt": "Exit Only screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/exit-only-2.webp",
+     "source": "shots/exit-only-2.webp",
+     "alt": "Exit Only screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/exit-only-3.webp",
+     "source": "shots/exit-only-3.webp",
+     "alt": "Exit Only screenshot 3",
+     "xray": false
+    },
+    {
+     "file": "shots/exit-only-4.webp",
+     "source": "shots/exit-only-4.webp",
+     "alt": "Exit Only screenshot 4",
+     "xray": false
+    }
+   ],
+   "lines": [
+    "# Exit Only",
+    "",
+    "\u0001IMG0\u0001",
+    "",
+    "### A 3D police chase through a rainy night city that changes every run.",
+    "",
+    "The police only know where you are while someone can see you: break every",
+    "line of sight around corners, through traffic and under the Plaza Tunnel,",
+    "and stay out of the helicopter searchlight until they give up. Every run",
+    "builds a different city with its own closures, hour, weather and traffic.",
+    "Crashes leave dents and glass on the road, the car drives with gears and",
+    "real grip, and Rooftop Rush adds a sliding-vehicle puzzle on a gridlocked",
+    "parking deck. Every car, building and sound is made in-house. Free on",
+    "Arcnode Games.",
+    "",
+    "Built with Godot · GDScript · Blender · Python",
+    "",
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "\u0001IMG3\u0001",
+    "",
+    "[Visit](https://arcnode.dev/projects/exit-only)"
+   ]
+  },
+  {
+   "repo": "arcjournal",
+   "name": "ArcJournal",
+   "long": "Write daily entries, tag the mood behind them and grade your days, so patterns show up in your stats. Version 2 encrypts every entry on your computer with AES-256-GCM before it is saved, with a key only your passphrase or recovery key can open. Signs in with Arcnode and updates itself on every platform.",
+   "links": [
+    {
+     "label": "Source",
+     "url": "https://github.com/stinoooo/ArcJournal"
+    }
+   ],
+   "url": "https://arcnode.dev/projects/arcjournal",
+   "description": "A private daily journal for Windows, macOS and Linux, end-to-end encrypted.",
+   "tag": "Desktop · Electron",
+   "stars": 4,
+   "language": "JavaScript",
+   "pushed": "2026-11-27",
+   "forks": 0,
+   "watchers": 0,
+   "issues": 0,
+   "license": "MIT",
+   "created": "2026-02-12",
+   "branch": "main",
+   "commits": 54,
+   "files": 132,
+   "counts": {},
+   "github": "https://github.com/stinoooo/ArcJournal",
+   "stack": [
+    "Electron",
+    "JavaScript",
+    "Node.js"
+   ],
+   "images": [
+    {
+     "file": "shots/arcjournal.webp",
+     "source": "shots/arcjournal.webp",
+     "alt": "ArcJournal screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/arcjournal-2.webp",
+     "source": "shots/arcjournal-2.webp",
+     "alt": "ArcJournal screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/arcjournal-3.webp",
+     "source": "shots/arcjournal-3.webp",
+     "alt": "ArcJournal screenshot 3",
+     "xray": false
+    }
+   ],
+   "lines": [
+    "# ArcJournal",
+    "",
+    "\u0001IMG0\u0001",
+    "",
+    "### A private daily journal for Windows, macOS and Linux, end-to-end encrypted.",
+    "",
+    "Write daily entries, tag the mood behind them and grade your days, so",
+    "patterns show up in your stats. Version 2 encrypts every entry on your",
+    "computer with AES-256-GCM before it is saved, with a key only your",
+    "passphrase or recovery key can open. Signs in with Arcnode and updates",
+    "itself on every platform.",
+    "",
+    "Built with Electron · JavaScript · Node.js",
+    "",
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "[Visit](https://arcnode.dev/projects/arcjournal)",
+    "[Source](https://github.com/stinoooo/ArcJournal)"
+   ]
+  },
+  {
+   "repo": "arcnode-games",
+   "name": "Arcnode Games",
+   "long": "Installs games from signed releases, checks every file against an Ed25519 signature before it runs, and updates games and itself by downloading only what changed. Signing in is optional, and installed games play fully offline. Exit Only is its first title.",
+   "links": [],
+   "url": "https://arcnode.dev/projects/arcnode-games",
+   "description": "The launcher that installs, verifies and updates my games.",
+   "tag": "Desktop · Tauri + Rust",
+   "stars": null,
+   "language": "Tauri",
+   "pushed": null,
+   "forks": null,
+   "watchers": null,
+   "issues": null,
+   "license": null,
+   "created": null,
+   "branch": "main",
+   "commits": null,
+   "files": null,
+   "counts": {},
+   "github": null,
+   "stack": [
+    "Tauri",
+    "Rust",
+    "React",
+    "TypeScript"
+   ],
+   "images": [
+    {
+     "file": "shots/arcnode-games.webp",
+     "source": "shots/arcnode-games.webp",
+     "alt": "Arcnode Games screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/arcnode-games-2.webp",
+     "source": "shots/arcnode-games-2.webp",
+     "alt": "Arcnode Games screenshot 2",
+     "xray": false
+    },
+    {
+     "file": "shots/arcnode-games-3.webp",
+     "source": "shots/arcnode-games-3.webp",
+     "alt": "Arcnode Games screenshot 3",
+     "xray": false
+    }
+   ],
+   "lines": [
+    "# Arcnode Games",
+    "",
+    "\u0001IMG0\u0001",
+    "",
+    "### The launcher that installs, verifies and updates my games.",
+    "",
+    "Installs games from signed releases, checks every file against an Ed25519",
+    "signature before it runs, and updates games and itself by downloading only",
+    "what changed. Signing in is optional, and installed games play fully",
+    "offline. Exit Only is its first title.",
+    "",
+    "Built with Tauri · Rust · React · TypeScript",
+    "",
+    "\u0001IMG1\u0001",
+    "",
+    "\u0001IMG2\u0001",
+    "",
+    "[Visit](https://arcnode.dev/projects/arcnode-games)"
+   ]
+  },
+  {
+   "repo": "arcflux",
+   "name": "ArcFlux",
+   "long": "Tracks color in a live camera feed and drives a physics simulation from it, producing responsive visuals you can project onto real surfaces.",
+   "links": [
+    {
+     "label": "Source",
+     "url": "https://github.com/stinoooo/ArcFlux"
+    }
+   ],
+   "url": "https://flux.arcnode.dev",
+   "description": "Color tracking and physics for projection mapping, in the browser.",
+   "tag": "Real-time · Graphics",
+   "stars": 0,
+   "language": "TypeScript",
+   "pushed": "2026-11-27",
+   "forks": 0,
+   "watchers": 0,
+   "issues": 0,
+   "license": "MIT",
+   "created": "2026-04-15",
+   "branch": "main",
+   "commits": 18,
+   "files": 63,
+   "counts": {},
+   "github": "https://github.com/stinoooo/ArcFlux",
    "stack": [
     "TypeScript",
-    "React",
     "Canvas",
-    "OpenTelemetry"
+    "Next.js"
    ],
-   "images": [],
+   "images": [
+    {
+     "file": "shots/arcflux.webp",
+     "source": "shots/arcflux.webp",
+     "alt": "ArcFlux screenshot 1",
+     "xray": false
+    },
+    {
+     "file": "shots/arcflux-2.webp",
+     "source": "shots/arcflux-2.webp",
+     "alt": "ArcFlux screenshot 2",
+     "xray": false
+    }
+   ],
    "lines": [
-    "# TraceKit",
+    "# ArcFlux",
     "",
+    "\u0001IMG0\u0001",
     "",
-    "### Zero-overhead OpenTelemetry trace viewer that runs entirely in the browser from JSONL trace dumps.",
+    "### Color tracking and physics for projection mapping, in the browser.",
     "",
-    "TraceKit lets engineers inspect distributed traces locally without spinning",
-    "up heavy observability backends. Drop a trace file into the browser and",
-    "inspect flamegraphs, critical paths, and span attributes.",
+    "Tracks color in a live camera feed and drives a physics simulation from it,",
+    "producing responsive visuals you can project onto real surfaces.",
     "",
-    "Built with TypeScript · React · Canvas · OpenTelemetry",
+    "Built with TypeScript · Canvas · Next.js",
     "",
-    "[Visit](https://github.com/alexrivera/tracekit)"
+    "\u0001IMG1\u0001",
+    "",
+    "[Visit](https://flux.arcnode.dev)",
+    "[Source](https://github.com/stinoooo/ArcFlux)"
    ]
   },
   {
-   "repo": "schemasync",
-   "url": "https://github.com/alexrivera/schemasync",
-   "description": "Automated database migration validator that catches breaking schema changes and missing indexes in CI.",
-   "tag": "Tooling · Python",
-   "stars": null,
-   "language": "Python",
-   "pushed": null,
-   "forks": null,
-   "watchers": null,
-   "issues": null,
+   "repo": "arcunzip",
+   "name": "ArcUnzip",
+   "long": "Drop in an archive and it is unpacked and shown in the browser. Files never leave your device.",
+   "links": [
+    {
+     "label": "Source",
+     "url": "https://github.com/stinoooo/ArcUnzip"
+    }
+   ],
+   "url": "https://unzip.arcnode.dev",
+   "description": "Open a .zip right in the browser, with nothing uploaded.",
+   "tag": "Web · Utility",
+   "stars": 0,
+   "language": "TypeScript",
+   "pushed": "2026-11-27",
+   "forks": 0,
+   "watchers": 0,
+   "issues": 0,
    "license": null,
-   "created": null,
+   "created": "2026-04-01",
    "branch": "main",
-   "commits": null,
-   "files": null,
+   "commits": 56,
+   "files": 28,
    "counts": {},
-   "github": "https://github.com/alexrivera/schemasync",
+   "github": "https://github.com/stinoooo/ArcUnzip",
    "stack": [
-    "Python",
-    "PostgreSQL",
-    "GitHub Actions"
+    "TypeScript",
+    "Next.js"
    ],
    "images": [],
    "lines": [
-    "# SchemaSync",
+    "# ArcUnzip",
     "",
     "",
-    "### Automated database migration validator that catches breaking schema changes and missing indexes in CI.",
+    "### Open a .zip right in the browser, with nothing uploaded.",
     "",
-    "SchemaSync parses SQL and ORM migrations in pull requests, simulates lock",
-    "contention against production table statistics, and posts actionable safety",
-    "reports.",
+    "Drop in an archive and it is unpacked and shown in the browser. Files never",
+    "leave your device.",
     "",
-    "Built with Python · PostgreSQL · GitHub Actions",
+    "Built with TypeScript · Next.js",
     "",
-    "[Visit](https://github.com/alexrivera/schemasync)"
+    "[Visit](https://unzip.arcnode.dev)",
+    "[Source](https://github.com/stinoooo/ArcUnzip)"
    ]
   },
   {
-   "repo": "minikv",
-   "url": "https://github.com/alexrivera/minikv",
-   "description": "A minimal Raft-backed key-value store built to explore consensus algorithms and deterministic simulation testing.",
-   "tag": "Storage · C",
-   "stars": null,
-   "language": "C",
-   "pushed": null,
-   "forks": null,
-   "watchers": null,
-   "issues": null,
-   "license": null,
-   "created": null,
+   "repo": "rosa-vscode",
+   "name": "rosa-vscode",
+   "long": "Colors, file icons and a small pixel dinosaur for the Rosa Wildlife Reserve team, in one VS Code extension.",
+   "links": [],
+   "url": "https://github.com/stinoooo/rosa-vscode",
+   "description": "A VS Code theme with Rosa Wildlife Reserve colors, icons and a pixel dinosaur.",
+   "tag": "Theme · VS Code",
+   "stars": 0,
+   "language": "JavaScript",
+   "pushed": "2026-10-29",
+   "forks": 0,
+   "watchers": 0,
+   "issues": 0,
+   "license": "MIT",
+   "created": "2026-10-23",
    "branch": "main",
-   "commits": null,
-   "files": null,
+   "commits": 11,
+   "files": 246,
    "counts": {},
-   "github": "https://github.com/alexrivera/minikv",
+   "github": "https://github.com/stinoooo/rosa-vscode",
    "stack": [
-    "C",
-    "Networking",
-    "Raft"
+    "JavaScript",
+    "VS Code"
    ],
    "images": [],
    "lines": [
-    "# MiniKV",
+    "# rosa-vscode",
     "",
     "",
-    "### A minimal Raft-backed key-value store built to explore consensus algorithms and deterministic simulation testing.",
+    "### A VS Code theme with Rosa Wildlife Reserve colors, icons and a pixel dinosaur.",
     "",
-    "MiniKV implements leader election, log replication, and snapshot compaction",
-    "in under 2,000 lines of C with a deterministic network simulator.",
+    "Colors, file icons and a small pixel dinosaur for the Rosa Wildlife Reserve",
+    "team, in one VS Code extension.",
     "",
-    "Built with C · Networking · Raft",
+    "Built with JavaScript · VS Code",
     "",
-    "[Visit](https://github.com/alexrivera/minikv)"
+    "[Visit](https://github.com/stinoooo/rosa-vscode)"
    ]
   },
   {
-   "repo": "dotfiles",
-   "url": "https://github.com/alexrivera/dotfiles",
-   "description": "Modular Neovim, Fish shell, and tmux configuration tuned for fast keyboard-driven development.",
-   "tag": "Config · Neovim",
-   "stars": null,
-   "language": "Lua",
-   "pushed": null,
-   "forks": null,
-   "watchers": null,
-   "issues": null,
-   "license": null,
-   "created": null,
+   "repo": "automod-badge-bot",
+   "name": "AutoMod badge bot",
+   "long": "Deploys AutoMod rules across your Discord servers so your bot earns the AutoMod Rule Creator badge.",
+   "links": [],
+   "url": "https://github.com/stinoooo/discord-automod-bot-badge",
+   "description": "Sets up AutoMod rules so a Discord bot earns its AutoMod badge.",
+   "tag": "Discord · Bot",
+   "stars": 0,
+   "language": "JavaScript",
+   "pushed": "2026-04-28",
+   "forks": 0,
+   "watchers": 0,
+   "issues": 0,
+   "license": "MIT",
+   "created": "2026-04-28",
    "branch": "main",
-   "commits": null,
-   "files": null,
+   "commits": 12,
+   "files": 7,
    "counts": {},
-   "github": "https://github.com/alexrivera/dotfiles",
+   "github": "https://github.com/stinoooo/discord-automod-bot-badge",
    "stack": [
-    "Lua",
-    "Neovim",
-    "Shell"
+    "JavaScript",
+    "discord.js"
    ],
    "images": [],
    "lines": [
-    "# Dotfiles",
+    "# AutoMod badge bot",
     "",
     "",
-    "### Modular Neovim, Fish shell, and tmux configuration tuned for fast keyboard-driven development.",
+    "### Sets up AutoMod rules so a Discord bot earns its AutoMod badge.",
     "",
-    "Cross-platform terminal environment with custom Lua plugins, minimal LSP",
-    "setup, and synchronized color palettes.",
+    "Deploys AutoMod rules across your Discord servers so your bot earns the",
+    "AutoMod Rule Creator badge.",
     "",
-    "Built with Lua · Neovim · Shell",
+    "Built with JavaScript · discord.js",
     "",
-    "[Visit](https://github.com/alexrivera/dotfiles)"
+    "[Visit](https://github.com/stinoooo/discord-automod-bot-badge)"
    ]
   }
  ],
@@ -604,83 +1090,80 @@
  },
  "work": [
   {
-   "when": "06/2024 – present",
-   "title": "Senior Systems Engineer",
-   "org": "CloudScale",
-   "where": "San Francisco · Hybrid",
-   "desc": "Leading the distributed query execution engine and low-latency telemetry pipeline in Rust and Go.",
-   "url": "https://example.com/cloudscale"
+   "when": "06/2026 – present",
+   "title": "Junior Full Stack Software Engineer",
+   "org": "Bemmel & Kroon",
+   "where": "Zoeterwoude-Rijndijk",
+   "desc": "Web apps and internal tools, front end and back end: turning what the company needs into practical software and automating how work gets done. Includes the staff scheduling app I started in 2025. I grew into this role from customer service and sales at the same company."
   },
   {
-   "when": "03/2022 – 05/2024",
-   "title": "Software Engineer",
-   "org": "DevFlow",
-   "where": "Remote",
-   "desc": "Built CLI developer tooling, local sandbox runtimes, and real-time build log streaming for 50k+ engineers.",
-   "url": "https://example.com/devflow"
+   "when": "02/2026 – 07/2026",
+   "title": "Software Engineering intern",
+   "org": "Genba Studio",
+   "where": "Leiden",
+   "desc": "An AI-driven content platform for a Dutch hospitality publisher: OpenAI assistants with a human check, cutting content from about a week to one or two days at around 90% accuracy. Front end, back end and design.",
+   "type": "internship"
   },
   {
-   "when": "01/2021 – present",
-   "title": "Core Maintainer",
-   "org": "OpenTrace",
-   "where": "Open source",
-   "desc": "Maintaining open-source distributed tracing SDKs and terminal visualization tools.",
-   "url": "https://github.com/alexrivera"
-  },
-  {
-   "when": "05/2020 – 08/2020",
-   "title": "Open Source Fellow",
-   "org": "SystemsLab",
-   "where": "Remote",
-   "desc": "Implemented zero-copy serialization primitives and benchmarked memory-mapped storage formats."
+   "when": "01/2026 – present",
+   "title": "Founder",
+   "org": "Arcnode",
+   "where": "Netherlands",
+   "url": "https://arcnode.dev",
+   "desc": "My studio for my own software and client work: desktop apps, a game and its launcher, community platforms and Backboard, the sign-in service behind all of them."
   }
  ],
- "talks": [
+ "education": [
   {
-   "name": "Systems Conf",
-   "place": "San Francisco, USA",
-   "when": "Oct 2025",
-   "lat": 37.77,
-   "lon": -122.41,
-   "desc": "Building deterministic simulation harnesses for storage engines — catching race conditions before production.",
-   "url": "https://example.com/talk-1",
-   "photos": []
+   "when": "08/2026 – present",
+   "title": "Software Engineering (bachelor)",
+   "org": "The Hague University of Applied Sciences",
+   "where": "The Hague"
   },
   {
-   "name": "Open Source Summit",
-   "place": "London, UK",
-   "when": "May 2024",
-   "lat": 51.51,
-   "lon": -0.13,
-   "desc": "Designing zero-dependency developer tools that run fast on every platform.",
-   "url": "https://example.com/talk-2",
-   "photos": []
+   "when": "08/2023 – 08/2026",
+   "title": "Software Developer, accelerated track",
+   "org": "mboRijnland",
+   "where": "Leiden"
   }
  ],
+ "awards": [
+  {
+   "when": "10/2025",
+   "title": "1st place, Archeon Hackathon",
+   "where": "Alphen aan den Rijn",
+   "desc": "A two-factor authentication app with a password manager."
+  },
+  {
+   "when": "04/2024",
+   "title": "1st place, mboRijnland Hackathon",
+   "where": "with TU Delft",
+   "desc": "A solution for the IAmMirte case set by TU Delft."
+  }
+ ],
+ "talks": [],
  "links": [
   {
-   "label": "Email",
-   "url": "mailto:hello@alexrivera.dev"
-  },
-  {
    "label": "GitHub",
-   "url": "https://github.com/alexrivera"
+   "url": "https://github.com/stinoooo"
   },
   {
-   "label": "LinkedIn",
-   "url": "https://www.linkedin.com/in/alexrivera"
+   "label": "X",
+   "url": "https://x.com/s_tinoo"
   },
   {
-   "label": "X / Twitter",
-   "url": "https://x.com/alexrivera"
+   "label": "Arcnode",
+   "url": "https://arcnode.dev"
   },
   {
-   "label": "Blog",
-   "url": "https://alexrivera.dev/blog"
+   "label": "Email",
+   "url": "mailto:info@arcnode.dev"
   }
  ],
  "more": [
-  "minikv",
-  "dotfiles"
+  "arcflux",
+  "arcunzip",
+  "rosa-vscode",
+  "automod-badge-bot"
  ]
 }

@@ -5,8 +5,9 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, "portfolio.config.json"), "utf8"));
 const FETCH_GH = process.argv.includes("--fetch-github");
 
@@ -60,7 +61,7 @@ function syncIdentity() {
     .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${domain} — a quiet wall of code. ${tagline}">`)
     .replace(/(<a class="brand"[^>]*>.*?<span>)[^<]*(<\/span><\/a>)/s, `$1${domain}$2`)
     .replace(/<a href="https:\/\/github\.com\/[^"]*" rel="me">github<\/a>/, `<a href="${ghUrl}" rel="me">github</a>`)
-    .replace(/<h1 class="sr-only">[^<]*<\/h1>/, `<h1 class="sr-only">${domain} — ${tagline}</h1>`)
+    .replace(/<h1 class="sr-only">[^<]*<\/h1>/, `<h1 class="sr-only">${ID.name}, junior full stack engineer</h1>`)
     .replace(/<p class="note" aria-hidden="true">\/\/ [^<]*<\/p>/, `<p class="note" aria-hidden="true">// ${tagline}</p>`);
   write("index.html", idx);
 
@@ -68,10 +69,10 @@ function syncIdentity() {
   let sIdx = read("site/index.html");
   sIdx = sIdx
     .replace(/<title>[^<]*<\/title>/, `<title>${domain}</title>`)
-    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${domain} — work, projects, talks and themes, opened in an editor.">`)
+    .replace(/<meta name="description" content="[^"]*">/, `<meta name="description" content="${domain}: my projects, work and stack, opened in an editor.">`)
     .replace(/(<a class="brand"[^>]*>.*?<span>)[^<]*(<\/span><\/a>)/s, `$1${domain}$2`)
     .replace(/<a href="https:\/\/github\.com\/[^"]*" rel="me">github<\/a>/, `<a href="${ghUrl}" rel="me">github</a>`)
-    .replace(/<h1 class="sr-only">[^<]*<\/h1>/, `<h1 class="sr-only">${domain} — work, projects, talks and themes.</h1>`)
+    .replace(/<h1 class="sr-only">[^<]*<\/h1>/, `<h1 class="sr-only">${ID.name}: projects, work and stack</h1>`)
     .replace(/<span class="bar-title">[^<]*<\/span>/, `<span class="bar-title">${barTitle}</span>`);
   write("site/index.html", sIdx);
 
@@ -180,12 +181,19 @@ function repoFacts(full) {
 }
 
 // ---------- 4. Projects ----------
+const PREVIOUS = new Map(
+  (fs.existsSync(path.join(ROOT, "site/content.json")) ? readJson("site/content.json").projects : []).map((p) => [
+    p.repo,
+    { stars: p.stars, forks: p.forks, watchers: p.watchers, issues: p.issues, license: p.license, language: p.language, pushed: p.pushed, created: p.created, branch: p.branch, commits: p.commits, files: p.files },
+  ]),
+);
 const MORE = [];
 const projects = CONFIG.projects.map((p) => {
   const id = slug(p.name);
   if (p.more) MORE.push(id);
   const full = p.githubRepo || (p.url?.startsWith("https://github.com/") ? p.url.replace("https://github.com/", "").replace(/\/$/, "") : null);
-  const facts = repoFacts(full);
+  // Offline runs keep the numbers from the last run with --fetch-github instead of dropping them.
+  const facts = FETCH_GH ? repoFacts(full) : PREVIOUS.get(id) || {};
   const images = (p.shots || []).map((s, i) => ({
     file: s.startsWith("shots/") ? s : `shots/${path.basename(s)}`,
     source: s,
@@ -208,6 +216,9 @@ const projects = CONFIG.projects.map((p) => {
   ];
   return {
     repo: id,
+    name: p.name,
+    long: p.long || null,
+    links: p.links || [],
     url: p.url || null,
     description: p.desc,
     tag: p.tag || null,
@@ -231,7 +242,7 @@ const projects = CONFIG.projects.map((p) => {
 });
 
 // ---------- 5. GitHub Stats, Months, Wall ----------
-const ICON_SLUG = { "C#": "csharp", "C++": "cplusplus", HTML: "html5", "Jupyter Notebook": "jupyter", "Objective-C": "apple", Shell: "gnubash", Vue: "vuedotjs", "Next.js": "nextdotjs", "Node.js": "nodedotjs", "React Native": "react", "Socket.io": "socketdotio", Rails: "rubyonrails", "Three.js": "threedotjs", Vercel: "vercel", Android: "android", Flutter: "flutter", PostgreSQL: "postgresql", Prisma: "prisma", Express: "express", React: "react", "Vanilla JS": "javascript", "Canvas 2D": "html5" };
+const ICON_SLUG = { "Claude Code": "claude", OpenAI: "openai", "C#": "csharp", "C++": "cplusplus", HTML: "html5", "Jupyter Notebook": "jupyter", "Objective-C": "apple", Shell: "gnubash", Vue: "vuedotjs", "Next.js": "nextdotjs", "Node.js": "nodedotjs", "React Native": "react", "Socket.io": "socketdotio", Rails: "rubyonrails", "Three.js": "threedotjs", Vercel: "vercel", Android: "android", Flutter: "flutter", PostgreSQL: "postgresql", Prisma: "prisma", Express: "express", React: "react", "Vanilla JS": "javascript", "Canvas 2D": "html5" };
 const iconCache = new Map();
 async function icon(name) {
   const s = ICON_SLUG[name] || name.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -250,10 +261,19 @@ async function icon(name) {
 
 if (FETCH_GH) {
   const owned = gh("--paginate", `users/${OWNER}/repos?per_page=100&type=owner`).filter((r) => !r.fork);
+  // Language shares count every repository I own, private ones included, because most of my
+  // work is private. Only the percentages are published, never the private repository names.
+  const NOT_CODE = new Set(["HTML", "CSS", "SCSS", "Dockerfile", "Procfile", "Shell", "PowerShell", "Batchfile", "Makefile", "Standard ML", "MDX", "Inno Setup", "NSIS"]);
+  // Listing private repositories needs a token of mine; the scheduled workflow may not have one.
+  // Then the language shares from the last full run are kept rather than shrunk to public code only.
+  const mine = ghTry("--paginate", "user/repos?per_page=100&affiliation=owner")?.filter((r) => !r.fork && r.owner?.login === OWNER) || null;
+  const previous = fs.existsSync(path.join(ROOT, "site/stack.json")) ? readJson("site/stack.json") : null;
+  const keepLanguages = !mine && previous?.languages?.length;
   const langBytes = new Map();
-  for (const r of owned.slice(0, 80)) {
+  for (const r of keepLanguages ? [] : (mine || owned).slice(0, 120)) {
     const l = ghTry(`repos/${r.full_name}/languages`) || {};
     for (const [name, bytes] of Object.entries(l)) {
+      if (NOT_CODE.has(name)) continue;
       const e = langBytes.get(name) || { name, bytes: 0, repos: 0 };
       e.bytes += bytes;
       e.repos += 1;
@@ -265,6 +285,7 @@ if (FETCH_GH) {
   for (const l of [...langBytes.values()].sort((a, b) => b.bytes - a.bytes).slice(0, 12)) {
     languages.push({ ...l, share: l.bytes / totalBytes, icon: await icon(l.name) });
   }
+  if (keepLanguages) languages.push(...previous.languages);
   const toolCount = new Map();
   for (const p of CONFIG.projects) for (const s of p.stack || []) toolCount.set(s, (toolCount.get(s) || 0) + 1);
   const tools = [];
@@ -273,7 +294,9 @@ if (FETCH_GH) {
   }
   const site = [];
   for (const s of CONFIG.siteStack || []) site.push({ ...s, icon: await icon(s.name) });
-  write("site/stack.json", { fetchedAt: iso, owner: OWNER, repos: Math.min(owned.length, 80), languages, tools, ai: [], site, source: "GitHub languages API + project stacks" });
+  const ai = [];
+  for (const t of CONFIG.aiStack || []) ai.push({ ...t, icon: await icon(t.icon || t.name) });
+  write("site/stack.json", { fetchedAt: iso, owner: OWNER, repos: keepLanguages ? previous.repos : Math.min((mine || owned).length, 120), languages, tools, ai, site, source: "GitHub languages API across all my repositories + project stacks" });
 
   const LEVEL = { NONE: 0, FIRST_QUARTILE: 1, SECOND_QUARTILE: 2, THIRD_QUARTILE: 3, FOURTH_QUARTILE: 4 };
   const cal = gql(`{user(login:"${OWNER}"){followers{totalCount} contributionsCollection(from:"${YEAR}-01-01T00:00:00Z",to:"${iso}"){contributionCalendar{totalContributions weeks{contributionDays{date contributionCount contributionLevel}}}}}}`).user;
@@ -295,8 +318,9 @@ if (FETCH_GH) {
   for (let m = 0; m <= now.getUTCMonth(); m++) {
     const from = new Date(Date.UTC(YEAR, m, 1)).toISOString();
     const to = new Date(Math.min(Date.UTC(YEAR, m + 1, 1) - 1, now.getTime())).toISOString();
-    const r = gql(`{user(login:"${OWNER}"){contributionsCollection(from:"${from}",to:"${to}"){commitContributionsByRepository(maxRepositories:5){repository{name owner{login}} contributions{totalCount}}}}}`).user.contributionsCollection.commitContributionsByRepository;
-    months.push({ month: from.slice(0, 7), top: r.map((x) => ({ repo: x.repository.name, owner: x.repository.owner.login, commits: x.contributions.totalCount })) });
+    const r = gql(`{user(login:"${OWNER}"){contributionsCollection(from:"${from}",to:"${to}"){commitContributionsByRepository(maxRepositories:10){repository{name isPrivate owner{login}} contributions{totalCount}}}}}`).user.contributionsCollection.commitContributionsByRepository;
+    // Only public repositories are named on the site.
+    months.push({ month: from.slice(0, 7), top: r.filter((x) => !x.repository.isPrivate).slice(0, 5).map((x) => ({ repo: x.repository.name, owner: x.repository.owner.login, commits: x.contributions.totalCount })) });
   }
   write("site/months.json", { from: snapshot.contributions.from, to: TODAY, fetchedAt: iso, scope: "GitHub-attributed public commit contributions per repository and month", months });
 
@@ -307,7 +331,8 @@ if (FETCH_GH) {
     const r = ghTry(`repos/${full}`);
     if (!r) continue;
     const tree = ghTry(`repos/${full}/git/trees/${r.default_branch}?recursive=1`)?.tree || [];
-    const pick = tree.filter((f) => f.type === "blob" && LANG[f.path.split(".").pop()] && f.size > 800 && f.size < 8000 && !/test|spec|mock|node_modules|dist|vendor|\.min\.|generated/i.test(f.path)).slice(0, n);
+    // A list of paths picks those files; a number picks that many files automatically.
+    const pick = Array.isArray(n) ? n.map((p) => tree.find((f) => f.path === p)).filter(Boolean) : tree.filter((f) => f.type === "blob" && LANG[f.path.split(".").pop()] && f.size > 800 && f.size < 8000 && !/test|spec|mock|node_modules|dist|vendor|\.min\.|generated/i.test(f.path)).slice(0, n);
     for (const f of pick) {
       const text = ghRaw(`repos/${full}/git/blobs/${f.sha}`);
       files.push({ repo: full.split("/")[1], path: f.path, sha: f.sha, lang: LANG[f.path.split(".").pop()], firstLine: 1, url: `https://github.com/${full}/blob/${f.sha}/${f.path}`, lines: text.replace(/\t/g, "  ").split("\n").slice(0, 80).map((l) => l.replace(/\s+$/, "")) });
@@ -345,6 +370,8 @@ write("site/content.json", {
   themeStats: {},
   themeThumbs,
   work: CONFIG.work || [],
+  education: CONFIG.education || [],
+  awards: CONFIG.awards || [],
   talks: CONFIG.talks || [],
   links: CONFIG.links || [],
   more: MORE,

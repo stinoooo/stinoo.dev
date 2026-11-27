@@ -112,7 +112,7 @@ function row(segments, className = "") {
 }
 
 export function prompt(cwd, branch) {
-  return [["alex", "t-user"], ["@dev", "t-host"], " ", [cwd, "t-path"], ...(branch ? [" ", [`(${branch})`, "t-git"]] : [])];
+  return [["stijn", "t-user"], ["@dev", "t-host"], " ", [cwd, "t-path"], ...(branch ? [" ", [`(${branch})`, "t-git"]] : [])];
 }
 
 function buildCalendar({ days, months = [], done = "" }) {
@@ -164,7 +164,7 @@ function monthParts(step) {
   const parts = [syn("("), syn(`"${step.month}"`), syn(", { ")];
   step.top.forEach((item, k) => {
     if (k) parts.push(syn(", "));
-    parts.push([JSON.stringify(item.owner && item.owner !== "alexrivera" ? `${item.owner}/${item.repo}` : item.repo), ""], syn(": "), [String(item.commits), ""]);
+    parts.push([JSON.stringify(item.owner && item.owner !== "stinoooo" ? `${item.owner}/${item.repo}` : item.repo), ""], syn(": "), [String(item.commits), ""]);
   });
   parts.push(syn(" });"), [" // public commits", ""]);
   return parts;
@@ -345,6 +345,7 @@ export function createTerminal(buffer, options) {
     const n = viewer.shots.length;
     if (n < 2) return false;
     showShot(((k % n) + n) % n);
+    options.watch?.slide?.(manual);
     restart(manual || Boolean(filmOf(viewer)));
     return true;
   }
@@ -561,6 +562,7 @@ export function createTerminal(buffer, options) {
         head?.classList.remove("is-head");
         head = cal.cells[k];
         head.classList.add("is-on", "is-head");
+        if (k % 4 === 0) options.watch?.line?.();
         const rect = head.getBoundingClientRect();
         if (rect.width) options.watch?.focus(rect.left + rect.width / 2, rect.top + rect.height / 2);
         await sleep(CAL.day);
@@ -591,6 +593,7 @@ export function createTerminal(buffer, options) {
           if (mine !== token) return;
           options.watch?.pressKey("Enter");
         }
+        if (!instant && ((block.out?.length || 0) > 2 || block.calendar || block.viewer)) options.watch?.data?.();
         if (block.link) {
           cmd.replaceChildren(block.cmd.slice(0, block.cmd.length - block.link.text.length));
           fill(cmd, [[block.link.text, "", block.link.href]]);
@@ -598,6 +601,7 @@ export function createTerminal(buffer, options) {
         for (const out of block.out || []) {
           if (mine !== token) return;
           buffer.append(row(out.segments, out.className));
+          options.watch?.line?.();
           if (!instant) await sleep(PACE.line);
         }
         if (block.mount && mine === token) {
@@ -618,7 +622,10 @@ export function createTerminal(buffer, options) {
       }
       if (mine !== token) return;
       const idle = row(prompt(spec.cwd, spec.branch), "t-prompt-row");
-      const cursor = row([["› ", "t-caret"], ["", "t-cursor"]], "t-idle");
+      // the last prompt takes typed commands, like a shell, when the page provides an input for it
+      const input = options.prompt?.();
+      const cursor = row([["› ", "t-caret"], ...(input ? [] : [["", "t-cursor"]])], "t-idle");
+      if (input) cursor.firstChild.append(input);
       buffer.append(idle, cursor);
     } finally {
       if (mine === token) onTyping?.(false);
