@@ -403,7 +403,7 @@ function aboutSpec() {
   return {
     cwd: "~",
     branch: null,
-    shots: [{ file: "shots/banjer.webp", repo: "banjer", name: "banjer.webp", alt: "Banjer, a curly brown dog in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" }],
+    shots: [{ file: "shots/banjer.webp", repo: "banjer", name: "banjer.webp", alt: "Banjer, a curly brown labradoodle in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" }],
     hero: (host) => createPortrait(host, { onRow: (row) => row % 3 === 0 && sfx.line() }),
     blocks: [
       {
@@ -422,7 +422,7 @@ function aboutSpec() {
       },
       { cmd: "ls links/", out: [{ segments: about.links.flatMap((link, k) => [...(k ? ["   "] : []), [link.name, "", link.url]]) }, { segments: [["discord ", "t-key"], "bossmannn"], className: "t-dim" }] },
       { cmd: "ls ~/banjer/", viewer: true },
-      { cmd: "cat ~/banjer/README", out: [{ segments: ["Banjer, head of quality assurance. Most of my bugs get solved on his walks. Very good at the beach, less good at code review."], className: "t-dim" }] },
+      { cmd: "cat ~/banjer/README", out: [{ segments: ["Banjer, my lovely labradoodle and head of quality assurance. Most of my bugs get solved on his walks. Very good at the beach, less good at code review."], className: "t-dim" }] },
       ...(stack ? [] : [calendarBlock()]),
     ],
   };

@@ -17,7 +17,7 @@ const FACTS = [
   ["ships", "Vercel, Railway, Cloudflare, GitHub Actions"],
   ["wins", "2 hackathons, both 1st place"],
   ["off", "mountain biking, drums, gaming"],
-  ["dog", "Banjer, head of quality assurance"],
+  ["dog", "Banjer, lovely labradoodle, head of quality assurance"],
 ];
 const reduced = matchMedia("(prefers-reduced-motion: reduce)");
 let art = null;
