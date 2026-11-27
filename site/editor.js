@@ -166,7 +166,7 @@ const entries = [
   ...children,
 ];
 const items = entries.filter((entry) => !entry.parent).map((entry) =>
-  entry.kind === "project" ? { entry, label: entry.label, src: entry.data.images[0]?.file, pushed: entry.data.pushed } : { entry, label: entry.label, tile: entry.tile },
+  entry.kind === "project" ? { entry, label: entry.label, src: entry.data.cover || entry.data.images[0]?.file, pushed: entry.data.pushed } : { entry, label: entry.label, tile: entry.tile },
 );
 
 const bar = createBar(barHost);
@@ -364,6 +364,13 @@ function projectSpec(project) {
     ...(project.stack?.length ? [{ segments: [" "] }, { segments: [[pad("built"), "t-key"], project.stack.join(" · ")] }] : []),
   ];
   const blocks = [{ cmd: "cat README.md", out: readme }];
+  if (project.case) {
+    const part = (title, text) => [{ segments: [[title, "md-h"]] }, { segments: [text] }];
+    blocks.push({
+      cmd: "cat CASE-STUDY.md",
+      out: [...part("## the problem", project.case.problem), { segments: [" "] }, ...part("## what I built", project.case.built), { segments: [" "] }, ...part("## the result", project.case.result)],
+    });
+  }
   if (project.github) {
     blocks.push({
       cmd: `gh repo view ${project.github.replace("https://github.com/", "")}`,
@@ -587,7 +594,7 @@ function moreSpec() {
           const cards = list.map((project) => ({ repo: project.repo, slug: project.repo, name: project.repo, description: project.description || "", included: false, palette: [], note: [project.language, project.license].filter(Boolean).join(" · ") }));
           const archive = createArchive(host, cards, {
             stats: Object.fromEntries(list.map((project) => [project.repo, { stars: project.stars || 0, forks: project.forks || 0, created: project.created, pushed: project.pushed }])),
-            thumbs: Object.fromEntries(list.map((project) => [project.repo, project.images[0]?.file])),
+            thumbs: Object.fromEntries(list.map((project) => [project.repo, project.cover || project.images[0]?.file])),
             current: lastChild,
             viewport: buffer,
             onPick(card) {
@@ -1032,7 +1039,7 @@ wheel = createWheel(wheelHost, {
 });
 const moreAt = items.findIndex((item) => item.entry.kind === "more");
 if (moreAt >= 0)
-  triptych(childrenOf("more").map((entry) => entry.data.images[0]?.file).filter(Boolean))
+  triptych(childrenOf("more").map((entry) => entry.data.cover || entry.data.images[0]?.file).filter(Boolean))
     .then((src) => wheel.setSrc(moreAt, src))
     .catch(() => {});
 if (!reduced.matches) await typeCmd(":e ~/Projects", 18);

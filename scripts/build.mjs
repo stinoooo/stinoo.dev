@@ -88,7 +88,7 @@ const person = {
   alumniOf: [{ "@type": "CollegeOrUniversity", name: "The Hague University of Applied Sciences" }, { "@type": "EducationalOrganization", name: "mboRijnland" }],
   address: { "@type": "PostalAddress", addressLocality: "Leiden", addressCountry: "NL" },
   knowsAbout: ["TypeScript", "Next.js", "React", "Rust", "Tauri", "Electron", "Godot", "PostgreSQL", "Discord bots"],
-  sameAs: ["https://github.com/stinoooo", "https://x.com/s_tinoo", "https://arcnode.dev"],
+  sameAs: config.links.map((link) => link.url).filter((url) => url.startsWith("https://")),
 };
 
 function head({ title, description, path: page, preload = [] }) {
@@ -116,6 +116,9 @@ function head({ title, description, path: page, preload = [] }) {
     `<link rel="preload" href="/assets/fonts/plex-mono.woff2" as="font" type="font/woff2" crossorigin>`,
     ...preload,
     `<script type="application/ld+json">${JSON.stringify(person)}</script>`,
+    // Vercel Speed Insights, free tier: real load times, no cookies, nothing stored about a visitor.
+    `<script>window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };</script>`,
+    `<script defer src="/_vercel/speed-insights/script.js"></script>`,
   ].join("\n");
 }
 

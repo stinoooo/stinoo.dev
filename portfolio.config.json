@@ -69,7 +69,12 @@
         "PostgreSQL",
         "Turborepo"
       ],
-      "url": "https://arcnode.dev"
+      "url": "https://arcnode.dev",
+      "case": {
+        "problem": "Every app I made needed the same things: an account, downloads, updates, a status page and somewhere to ask for help. Building those again inside each app would mean a separate login for every app and the same bugs fixed five times.",
+        "built": "One monorepo that holds all of it. Backboard is my own OAuth 2.0 and OpenID Connect sign-in service with PKCE, so every app signs in with \"Login with Arcnode\". Next to it: the website with a client portal, a games API for profiles, leaderboards and cloud saves, a pipeline that signs game releases, a status page and the community bot.",
+        "result": "ArcJournal, Arcnode Games and Arcnode Remote all sign in with one Arcnode account, and every game release is signed and checked before it runs. A new app starts with accounts, updates and support already there."
+      }
     },
     {
       "name": "Arcnode Remote",
@@ -87,7 +92,12 @@
         "React",
         "TypeScript"
       ],
-      "url": "https://arcnode.dev/projects/arcnode-remote"
+      "url": "https://arcnode.dev/projects/arcnode-remote",
+      "case": {
+        "problem": "Remote-support apps are also what phone scammers ask people to install. Someone getting help should see exactly who is connecting, decide what that person may do and be able to stop it at any moment.",
+        "built": "A Windows app in Tauri, Rust and React. The helper shares a nine-digit code that works once and expires after ten minutes. The other person sees the helper's Arcnode account, compares a six-digit code and approves every permission separately. Sessions are end-to-end encrypted with the Noise XX protocol and pass through a relay that cannot read them.",
+        "result": "It can be downloaded from remote.arcnode.dev and installs signed updates. It is still in active development: so far I have tested it with both ends on one PC, and testing between separate computers is next."
+      }
     },
     {
       "name": "Rosa Wildlife Reserve",
@@ -107,7 +117,12 @@
         "Prisma",
         "PostgreSQL"
       ],
-      "url": "https://rosarealism.com"
+      "url": "https://rosarealism.com",
+      "case": {
+        "problem": "A hardcore realism server for Path of Titans, a multiplayer dinosaur survival game. Staff needed one place for applications, reports, penalties, appeals and tickets that also reached into the game itself, and members needed a home for their characters outside Discord.",
+        "built": "Five Discord bots that each do one job, and rosarealism.com with a page for every member and character, all on one PostgreSQL database. The bots talk to the game server directly, so a ban decided in Discord is carried out in the game. A separate status page keeps working when everything else is down.",
+        "result": "Live for a Discord of more than 2,700 members, with 177 bot commands. Staff run applications, reports and tickets with the game server in the loop, and change how the bots behave from the website without a new release."
+      }
     },
     {
       "name": "Vardoxen",
@@ -127,7 +142,12 @@
         "Python",
         "discord.py"
       ],
-      "url": "https://vardoxen.tv"
+      "url": "https://vardoxen.tv",
+      "case": {
+        "problem": "Streamer Vardoxen's community was growing and needed one home: every channel and link in one place, a safe way to collect community submissions, and tools for giveaways and supporters. Access had to follow the roles people already have in Discord, without a second login.",
+        "built": "vardoxen.tv with Discord sign-in, where server roles map straight to permissions. A moderated, anonymous submissions board, giveaways, a supporter wall, live alerts and a role-based admin dashboard. The site and the Citadel bot, written in Python, share one database.",
+        "result": "vardoxen.tv is live as the community hub. Permissions come from Discord roles and the site and bot stay in sync, so the team runs everything from one place."
+      }
     },
     {
       "name": "Bemmel & Kroon Scheduling",
@@ -146,7 +166,12 @@
         "Tailwind CSS",
         "Zod"
       ],
-      "url": "https://arcnode.dev/projects/bemmel-kroon-werkplanning"
+      "url": "https://arcnode.dev/projects/bemmel-kroon-werkplanning",
+      "case": {
+        "problem": "Bemmel & Kroon sells kitchens and appliances online and in three showrooms. Planning shifts across departments and locations, with absence and leave in the same picture, was spread over separate tools.",
+        "built": "An internal web app with a weekly roster grid and published snapshots, absence and leave inside the schedule, rights per role, location and department, an audit log and an analytics dashboard. It started in PHP and MySQL in 2025 and I rebuilt it in Next.js, with Excel and calendar export, email notifications and an installable app for phones.",
+        "result": "One private app where staff, team leads and management plan shifts and handle absence, on a desktop or a phone, with a record of who changed what."
+      }
     },
     {
       "name": "Exit Only",
@@ -154,6 +179,13 @@
       "desc": "A 3D police chase through a rainy night city that changes every run.",
       "long": "The police only know where you are while someone can see you: break every line of sight around corners, through traffic and under the Plaza Tunnel, and stay out of the helicopter searchlight until they give up. Every run builds a different city with its own closures, hour, weather and traffic. Crashes leave dents and glass on the road, the car drives with gears and real grip, and Rooftop Rush adds a sliding-vehicle puzzle on a gridlocked parking deck. Every car, building and sound is made in-house. Free on Arcnode Games.",
       "shots": [
+        {
+          "film": "shots/exit-only-trailer.mp4",
+          "poster": "shots/exit-only-trailer.webp",
+          "duration": 46,
+          "name": "trailer.mp4",
+          "alt": "The Exit Only trailer: a red car escapes police through a rainy night city, with roadblocks, spikes and a helicopter, then a rooftop parking puzzle"
+        },
         "shots/exit-only.webp",
         "shots/exit-only-2.webp",
         "shots/exit-only-3.webp",
