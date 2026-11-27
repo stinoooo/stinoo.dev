@@ -753,7 +753,7 @@ function showHelp() {
 
 function contact() {
   goTo(entries.find((entry) => entry.kind === "about"));
-  say("contact: stijn@stinoo.dev · github.com/stinoooo · x.com/s_tinoo · discord bossmannn");
+  say("contact: stijn@stinoo.dev · github.com/stinoooo · linkedin.com/in/stijnheemskerk · x.com/s_tinoo · discord bossmannn");
 }
 
 function openDrawer() {
