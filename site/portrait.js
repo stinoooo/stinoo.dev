@@ -7,7 +7,7 @@ const FACTS = [
   ["os", "Stijn Heemskerk"],
   ["host", "Leiden, the Netherlands"],
   ["uptime", () => uptime()],
-  ["work", "junior full stack engineer, Bemmel & Kroon"],
+  ["work", "junior full stack software engineer, Bemmel & Kroon"],
   ["school", "Software Engineering, The Hague University"],
   ["studio", "Arcnode"],
   ["langs", "TypeScript, JavaScript, PHP, Python, SQL, Rust, GDScript"],
