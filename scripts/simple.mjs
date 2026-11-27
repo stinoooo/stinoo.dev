@@ -169,7 +169,7 @@ ${head}
 </main>
 
 <footer class="foot">
-  <p>Stijn Heemskerk · <a href="/">stinoo.dev</a> · Built from <a href="https://github.com/pavanjoshi914/dev-portfolio-template">dev-portfolio-template</a> by Pavan Joshi, MIT license.</p>
+  <p>© 2026 Stijn Heemskerk · <a href="/">stinoo.dev</a> · designed, built and synthesized by me</p>
 </footer>
 </body>
 </html>

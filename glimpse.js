@@ -2,6 +2,51 @@ import { prefersStill, onWidthResize, rng } from "/intros/shared/common.js";
 import { sfx, soundToggle } from "/intros/shared/sfx.js";
 import { createCursor } from "/intros/shared/cursor.js";
 
+// The welcome card, once per visit. Its click is the one browsers need before sound may play,
+// so "start with sound" really starts with sound. The intro runs behind it.
+const gateNode = document.querySelector(".gate");
+let gate = null;
+try {
+  if (gateNode && !sessionStorage.getItem("stinoo.entered")) gate = gateNode;
+} catch {
+  gate = gateNode;
+}
+function closeGate(withSound) {
+  if (!gate) return;
+  const node = gate;
+  gate = null;
+  try {
+    sessionStorage.setItem("stinoo.entered", "1");
+  } catch {}
+  sfx.set(withSound);
+  node.classList.add("is-leaving");
+  setTimeout(() => (node.hidden = true), 400);
+}
+if (gate) {
+  gate.hidden = false;
+  gate.querySelector(".gate-start").addEventListener("click", () => closeGate(true));
+  gate.querySelector(".gate-quiet").addEventListener("click", () => closeGate(false));
+  gate.querySelector(".gate-start").focus({ preventScroll: true });
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (!gate) return;
+      if (event.key === "Enter" && !event.target.closest?.(".gate-simple, .gate-quiet")) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeGate(true);
+      } else if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeGate(false);
+      } else if (event.key !== "Tab") {
+        event.stopImmediatePropagation();
+      }
+    },
+    { capture: true },
+  );
+}
+
 const FONT_PX = 12;
 const CELL_W = 7.2;
 const CELL_H = 13;
@@ -1618,6 +1663,10 @@ for (const type of ["pointermove", "pointerdown", "keydown", "wheel", "touchstar
   window.addEventListener(type, () => (lastInput = performance.now()), { capture: true, passive: true });
 
 async function autoAdvance() {
+  if (gate) {
+    autoTried = false;
+    return false;
+  }
   if (leaving || picker || object || visitorSession || !enterLink || !noteLine) return false;
   if (performance.now() - lastInput < AUTO.quiet) return false;
   const started = performance.now();

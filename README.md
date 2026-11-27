@@ -12,10 +12,6 @@ Engineering student from Leiden. This site shows what I make, mostly under
 | [stinoo.dev/site](https://stinoo.dev/site/) | The portfolio, opened like an editor: about me, projects, experience, my stack and color themes. Type `help` at the prompt for every command. |
 | [stinoo.dev/simple](https://stinoo.dev/simple/) | The same story as a plain, readable page, for anyone who would rather not drive a terminal. |
 
-It started from Pavan Joshi's
-[dev-portfolio-template](https://github.com/pavanjoshi914/dev-portfolio-template) (MIT). The
-first commit on `main` is that template as it was; everything after it is mine.
-
 ## What is in it
 
 - **Everything is true and comes from one place.** My details, projects, work, school and awards live
@@ -106,4 +102,5 @@ vercel.json                           build, headers, caching, the /api/seen rew
 
 ## License
 
-MIT, see [LICENSE](LICENSE). The template is Pavan Joshi's; the content, photos and changes are mine.
+MIT for the code, see [LICENSE](LICENSE). My photos, my words and the product images are mine and not
+for reuse.

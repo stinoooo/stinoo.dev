@@ -346,3 +346,131 @@ body {
     outline-offset: 3px;
   }
 }
+
+/* the welcome card: the first click starts the intro and, if wanted, the sound */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(3px);
+  transition: opacity 0.35s ease, visibility 0.35s;
+}
+
+.gate[hidden] {
+  display: none;
+}
+
+.gate.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.gate-card {
+  width: min(440px, 100%);
+  padding: 26px 28px 22px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  background: var(--bg);
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.45);
+  font: 400 13px/1.6 "Plex Mono", ui-monospace, monospace;
+  color: var(--ink);
+}
+
+.gate-prompt {
+  margin: 0 0 18px;
+  color: var(--dim);
+}
+
+.gate-user {
+  color: var(--accent);
+}
+
+.gate-caret {
+  color: var(--accent);
+}
+
+.gate-title {
+  margin: 0 0 6px;
+  font: 700 26px/1.2 "Plex Mono", ui-monospace, monospace;
+}
+
+.gate-text {
+  margin: 0 0 22px;
+  color: var(--ink);
+  opacity: 0.85;
+}
+
+.gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gate-start,
+.gate-simple {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--accent);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.gate-start {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.gate-simple {
+  background: transparent;
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+.gate-start:hover,
+.gate-simple:hover {
+  filter: brightness(1.12);
+}
+
+.gate-note {
+  margin: 10px 0 0;
+  color: var(--dim);
+  font-size: 12px;
+}
+
+.gate-quiet {
+  margin-top: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--dim);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .gate-card {
+    padding: 22px 20px 18px;
+  }
+
+  .gate-start,
+  .gate-simple {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate {
+    transition: none;
+  }
+}

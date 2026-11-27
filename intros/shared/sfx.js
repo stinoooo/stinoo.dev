@@ -192,8 +192,11 @@ function hiss({ at = 0, attack = 0.002, hold = 0, decay = 0.03, peak = 0.1, type
   src.stop(t + attack + hold + decay + 0.05);
 }
 
-function unlock() {
+function unlock(event) {
   if (!on) return;
+  // a click that is about to switch the sound off must not play anything first
+  if (event?.target instanceof Element && event.target.closest("[data-quiet-click]")) return;
+  if (event?.type === "keydown" && event.key === "Escape") return;
   const c = setup();
   if (!c) return;
   const fresh = !unlocked;
@@ -538,7 +541,6 @@ export const sfx = {
       unlocked = true;
       setTimeout(() => {
         startBed();
-        last.delete("boot");
         sfx.boot();
       }, 60);
     } else {
@@ -558,6 +560,8 @@ export function soundToggle(button) {
   if (!button) return;
   const paint = () => {
     button.textContent = sfx.on ? "sound on" : "sound off";
+    if (sfx.on) button.setAttribute("data-quiet-click", "");
+    else button.removeAttribute("data-quiet-click");
     button.setAttribute("aria-pressed", String(sfx.on));
     button.setAttribute("aria-label", sfx.on ? "Sound is on. Turn it off" : "Sound is off. Turn it on");
   };

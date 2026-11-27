@@ -45,7 +45,7 @@ git -C "$ROOT" diff HEAD | grep -nE '\+31 ?6|[1-9][0-9]{3} ?[A-Z]{2}|@gmail\.com
 ```
 
 Anything found: stop and report. Never commit a phone number, a home address or a personal email
-address. Contact on the site goes through info@arcnode.dev, GitHub, X and Discord.
+address. Contact on the site goes through stijn@stinoo.dev, GitHub, X and Discord.
 
 Generated data must not name private repositories. `site/months.json` and `wall.json` only list
 public ones; check when `scripts/build-data.mjs` changed:
