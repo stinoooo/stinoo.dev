@@ -174,7 +174,7 @@ let seenAt = 0;
 function loadSeen() {
   if (document.hidden || Date.now() - seenAt < 600e3) return;
   seenAt = Date.now();
-  load("/api/seen")
+  load("/api/seen/")
     .then((data) => bar.setSeen(data))
     .catch(() => {});
 }
@@ -192,7 +192,7 @@ function markSeen() {
         last = Number(localStorage.getItem("stinoo.seen")) || 0;
         if (Date.now() - last > 30 * 60e3) localStorage.setItem("stinoo.seen", String(Date.now()));
       } catch {}
-      if (Date.now() - last > 30 * 60e3) navigator.sendBeacon?.("/api/seen");
+      if (Date.now() - last > 30 * 60e3) navigator.sendBeacon?.("/api/seen/");
     }, 1000);
   };
   document.addEventListener("visibilitychange", arm);
