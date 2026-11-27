@@ -1,12 +1,12 @@
 {
  "owner": "stinoooo",
- "fetchedAt": "2026-11-27T18:59:08.076Z",
+ "fetchedAt": "2026-11-27T23:02:55.876Z",
  "about": {
   "repo": "stinoooo",
   "lines": [
    "# Stijn Heemskerk",
    "",
-   "Junior full stack software engineer at Bemmel & Kroon and Software Engineering student at The Hague University of Applied Sciences, from Leiden. I like making things all the way through: the code, but also the icon, the installer, the little sound when something works. Most of my own work ships under Arcnode, my small studio for my own projects and the occasional client. Away from the keyboard I mountain bike, play drums, and there is pretty much always music on.",
+   "Junior full stack software engineer at Bemmel & Kroon and Software Engineering student at The Hague University, from Leiden. I like making things all the way through: the code, but also the icon, the installer, the little sound when something works. Most of my own work ships under Arcnode, my small studio for my own projects and the occasional client. Away from the keyboard I mountain bike, play drums, and there is pretty much always music on.",
    "",
    "[GitHub](https://github.com/stinoooo)",
    "[LinkedIn](https://www.linkedin.com/in/stijnheemskerk)",
@@ -1269,7 +1269,7 @@
   {
    "when": "08/2026 – present",
    "title": "Software Engineering (bachelor)",
-   "org": "The Hague University of Applied Sciences",
+   "org": "The Hague University",
    "where": "The Hague"
   },
   {

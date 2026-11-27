@@ -85,7 +85,7 @@ const person = {
   image: `${SITE}/og.png`,
   jobTitle: "Junior Full Stack Software Engineer",
   worksFor: { "@type": "Organization", name: "Bemmel & Kroon" },
-  alumniOf: [{ "@type": "CollegeOrUniversity", name: "The Hague University of Applied Sciences" }, { "@type": "EducationalOrganization", name: "mboRijnland" }],
+  alumniOf: [{ "@type": "CollegeOrUniversity", name: "The Hague University" }, { "@type": "EducationalOrganization", name: "mboRijnland" }],
   address: { "@type": "PostalAddress", addressLocality: "Leiden", addressCountry: "NL" },
   knowsAbout: ["TypeScript", "Next.js", "React", "Rust", "Tauri", "Electron", "Godot", "PostgreSQL", "Discord bots"],
   sameAs: config.links.map((link) => link.url).filter((url) => url.startsWith("https://")),
