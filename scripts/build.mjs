@@ -107,7 +107,7 @@ function head({ title, description, path: page, preload = [] }) {
     `<meta property="og:image" content="${SITE}/og.png">`,
     `<meta property="og:image:width" content="1200">`,
     `<meta property="og:image:height" content="630">`,
-    `<meta property="og:image:alt" content="My profile picture drawn in ASCII characters beside my name, Stijn Heemskerk, junior full stack engineer.">`,
+    `<meta property="og:image:alt" content="A terminal window made of my code: my name, Stijn Heemskerk, junior full stack engineer, my projects Arcnode, Arcnode Remote, Rosa Wildlife Reserve and Vardoxen, and my profile picture in colored ASCII.">`,
     `<meta property="profile:first_name" content="Stijn">`,
     `<meta property="profile:last_name" content="Heemskerk">`,
     `<meta name="twitter:card" content="summary_large_image">`,
