@@ -40,8 +40,9 @@ Engineering student from Leiden. This site shows what I make, mostly under
 - **Case studies.** The five headline projects each have a short one (the problem, what I built,
   the result) under `case` in the config. The editor shows it as `CASE-STUDY.md`, the simple
   version beside each project's screenshots.
-- **Readable without scripts, by people and machines.** The simple version needs no JavaScript,
-  prints cleanly and passes an axe audit in light and dark. Every build also writes `robots.txt`,
+- **Readable without scripts, by people and machines.** The simple version works without
+  JavaScript (one small script, [`simple/gallery.js`](simple/gallery.js), turns the screenshot
+  links into a gallery with arrows, swipes and the back button), prints cleanly and passes an axe audit in light and dark. Every build also writes `robots.txt`,
   `sitemap.xml`, [`llms.txt`](https://stinoo.dev/llms.txt) and `llms-full.txt` (the portfolio as
   plain Markdown for language models), and the home-screen icons with `site.webmanifest`.
 

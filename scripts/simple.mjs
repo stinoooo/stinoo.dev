@@ -1,7 +1,8 @@
 // Renders /simple/: the same portfolio as a plain, readable page, for anyone who would rather
 // not drive a terminal. Built from portfolio.config.json and the baked GitHub data, so it always
-// says the same as the interactive site. No JavaScript: it works the same with scripts off, in a
-// reader view, for a screen reader and on paper.
+// says the same as the interactive site. It works the same with scripts off, in a reader view,
+// for a screen reader and on paper; one small script (simple/gallery.js) only adds the
+// screenshot gallery on top of plain links to the images.
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const bare = (url) => url.replace(/^https?:\/\//, "").replace(/^mailto:/, "").replace(/\/$/, "");
 const fmt = (n) => Number(n || 0).toLocaleString("en-US");
@@ -53,13 +54,15 @@ function gallery(p) {
   const main = film
     ? `<div class="shot is-film"><video controls preload="none" playsinline poster="/site/${esc(film.file)}" width="${size(film.file)[0]}" height="${size(film.file)[1]}" aria-label="${esc(film.alt)}"><source src="/site/${esc(film.video)}" type="video/mp4"></video></div>`
     : stills[0]
-      ? `<a class="shot" href="/site/${esc(stills[0].file)}">${picture(stills[0].file, altOf(p, stills[0], 0, total))}<span class="zoom" aria-hidden="true">${icon("arrow")}</span><span class="sr-only"> (full size)</span></a>`
+      ? `<a class="shot" href="/site/${esc(stills[0].file)}" data-gallery="${slug(p.name)}" data-title="${esc(p.name)}">${picture(stills[0].file, altOf(p, stills[0], 0, total))}<span class="zoom" aria-hidden="true">${icon("arrow")}</span><span class="sr-only"> (full size)</span></a>`
       : "";
   const rest = film ? stills : stills.slice(1);
   const offset = film ? 0 : 1;
+  // All of a project's screenshots form one gallery (simple/gallery.js).
+  const group = `data-gallery="${slug(p.name)}" data-title="${esc(p.name)}"`;
   const thumbs = rest.length
     ? `<ul class="thumbs" aria-label="More screenshots of ${esc(p.name)}">${rest
-        .map((image, k) => `<li><a href="/site/${esc(image.file)}">${picture(image.file, altOf(p, image, k + offset, total), { sizes: "180px" })}<span class="sr-only"> (full size)</span></a></li>`)
+        .map((image, k) => `<li><a href="/site/${esc(image.file)}" ${group}>${picture(image.file, altOf(p, image, k + offset, total), { sizes: "180px" })}<span class="sr-only"> (full size)</span></a></li>`)
         .join("")}</ul>`
     : "";
   return main ? `<div class="project-media">${main}${thumbs}</div>` : "";
@@ -147,7 +150,7 @@ function timeline(items, { compact = false } = {}) {
 const sectionHead = (id, kicker, title, lead = "") =>
   `<header class="section-head"><p class="kicker" aria-hidden="true">${kicker}</p><h2 id="${id}-title">${title}</h2>${lead ? `<p class="section-lead">${lead}</p>` : ""}</header>`;
 
-export function renderSimple({ config, content, snapshot, stack, head, styles, dims = {}, updated }) {
+export function renderSimple({ config, content, snapshot, stack, head, styles, dims = {}, updated, script }) {
   DIMS = dims;
   const projects = content.projects.map((p) => ({ ...p, ...config.projects.find((c) => slug(c.name) === p.repo) }));
   const more = new Set(content.more || []);
@@ -263,7 +266,7 @@ ${head}
     <p>And this is Banjer, my lovely labradoodle and head of quality assurance. Most of my bugs get solved on his walks.</p>
   </div>
   <figure class="dog">
-    <img src="/site/shots/banjer.webp" alt="Banjer, a curly brown labradoodle in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" width="560" height="746" sizes="(max-width: 820px) 280px, 300px" loading="lazy" decoding="async">
+    <a href="/site/shots/banjer.webp" data-gallery="banjer" data-title="Banjer"><img src="/site/shots/banjer.webp" alt="Banjer, a curly brown labradoodle in a blue harness, sitting on a sandy beach in front of tall cliffs, tongue out" width="560" height="746" sizes="(max-width: 820px) 280px, 300px" loading="lazy" decoding="async"><span class="sr-only"> (full size)</span></a>
     <figcaption>Banjer, head of quality assurance</figcaption>
   </figure>
 </section>
@@ -288,6 +291,7 @@ ${head}
     ${updated ? `<p class="updated">Updated <time datetime="${updated}">${MONTHS[Number(updated.slice(5, 7)) - 1]} ${Number(updated.slice(8, 10))}, ${updated.slice(0, 4)}</time></p>` : ""}
   </div>
 </footer>
+${script ? `<script type="module" src="${script}"></script>` : ""}
 </body>
 </html>
 `;
