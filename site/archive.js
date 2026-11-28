@@ -46,13 +46,16 @@ export function createArchive(host, themes, { stats = {}, thumbs = {}, current =
       button.type = "button";
       button.setAttribute("aria-label", `${theme.name}. ${theme.description}.${theme.included ? " Ships with Omarchy." : ""}`);
       button.setAttribute("aria-pressed", "false");
-      const img = make("img");
-      img.src = thumbs[theme.slug] || theme.image;
-      img.alt = "";
-      img.loading = "lazy";
-      img.decoding = "async";
-      img.width = 640;
-      img.height = 360;
+      const src = thumbs[theme.slug] || theme.image;
+      const img = src ? make("img") : null;
+      if (img) {
+        img.src = src;
+        img.alt = "";
+        img.loading = "lazy";
+        img.decoding = "async";
+        img.width = 640;
+        img.height = 360;
+      }
       const meta = make("span", "arc-meta");
       meta.append(make("span", "arc-name", theme.name));
       if (data) {
@@ -68,7 +71,15 @@ export function createArchive(host, themes, { stats = {}, thumbs = {}, current =
       }
       if (theme.note) swatches.append(make("span", "arc-note", theme.note));
       const shot = make("span", "arc-shot");
-      shot.append(img);
+      if (img) shot.append(img);
+      else {
+        // No screenshot (a bot, a small tool): show its README line instead of an empty frame.
+        shot.classList.add("is-text");
+        const readme = make("span", "arc-readme");
+        readme.setAttribute("aria-hidden", "true");
+        readme.append(make("span", "arc-readme-file", "README.md"), make("span", "arc-readme-text", theme.description));
+        shot.append(readme);
+      }
       if (theme.included) {
         const badge = make("span", "arc-badge");
         badge.setAttribute("aria-hidden", "true");
