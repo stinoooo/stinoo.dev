@@ -2262,3 +2262,38 @@ a.md-link:hover {
     display: none;
   }
 }
+
+/* A project without a screenshot shows its README line in the same 16:9 frame. */
+.arc-shot.is-text {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.arc-readme {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  height: 100%;
+  padding: 8px 10px;
+  border-top: 2px solid var(--accent);
+  color: color-mix(in srgb, var(--ink) 82%, var(--bg));
+  font: 400 11px/14px "Plex Mono", ui-monospace, monospace;
+  white-space: normal;
+}
+
+.arc-readme-file {
+  color: var(--dim);
+}
+
+.arc-readme-file::before {
+  content: "# ";
+  color: var(--accent);
+}
+
+.arc-readme-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
