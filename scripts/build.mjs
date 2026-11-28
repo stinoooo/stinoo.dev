@@ -149,6 +149,7 @@ const introScript = await (async () => {
   }
 })();
 const editorScript = await bundle("site/editor.js", "site/editor");
+const galleryScript = await bundle("simple/gallery.js", "simple/gallery");
 
 write(
   "index.html",
@@ -195,6 +196,7 @@ write(
     styles: await css(["simple/simple.css"]),
     dims,
     updated: today,
+    script: galleryScript,
     head: head({
       title: "Stijn Heemskerk · junior full stack software engineer",
       description: DESCRIPTION,
