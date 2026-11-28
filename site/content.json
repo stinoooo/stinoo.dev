@@ -1,6 +1,6 @@
 {
  "owner": "stinoooo",
- "fetchedAt": "2026-11-27T23:02:55.876Z",
+ "fetchedAt": "2026-11-28T00:19:41.450Z",
  "about": {
   "repo": "stinoooo",
   "lines": [
@@ -805,11 +805,25 @@
     "Next.js"
    ],
    "case": null,
-   "cover": null,
-   "images": [],
+   "cover": "shots/arcunzip.webp",
+   "images": [
+    {
+     "file": "shots/arcunzip.webp",
+     "source": "shots/arcunzip.webp",
+     "alt": "ArcUnzip with arcnode-demo.zip open: its folders on the left and manifest.json shown as a JSON tree on the right",
+     "xray": false
+    },
+    {
+     "file": "shots/arcunzip-2.webp",
+     "source": "shots/arcunzip-2.webp",
+     "alt": "ArcUnzip before a ZIP is opened, with the Open ZIP button and a search field for files and text",
+     "xray": false
+    }
+   ],
    "lines": [
     "# ArcUnzip",
     "",
+    "\u0001IMG0\u0001",
     "",
     "### Open a .zip right in the browser, with nothing uploaded.",
     "",
@@ -817,6 +831,8 @@
     "leave your device.",
     "",
     "Built with TypeScript · Next.js",
+    "",
+    "\u0001IMG1\u0001",
     "",
     "[Visit](https://unzip.arcnode.dev)",
     "[Source](https://github.com/stinoooo/ArcUnzip)"
@@ -848,11 +864,25 @@
     "VS Code"
    ],
    "case": null,
-   "cover": null,
-   "images": [],
+   "cover": "shots/rosa-vscode.webp",
+   "images": [
+    {
+     "file": "shots/rosa-vscode.webp",
+     "source": "shots/rosa-vscode.webp",
+     "alt": "VS Code in the dark Rosa theme: TypeScript code, Rosa file icons and Sprout, a pixel stegosaur with food, water and love bars",
+     "xray": false
+    },
+    {
+     "file": "shots/rosa-vscode-2.webp",
+     "source": "shots/rosa-vscode-2.webp",
+     "alt": "The same code in the light Rosa theme, with Sprout's look and pattern choices in the sidebar",
+     "xray": false
+    }
+   ],
    "lines": [
     "# rosa-vscode",
     "",
+    "\u0001IMG0\u0001",
     "",
     "### A VS Code theme with Rosa Wildlife Reserve colors, icons and a pixel dinosaur.",
     "",
@@ -860,6 +890,8 @@
     "team, in one VS Code extension.",
     "",
     "Built with JavaScript · VS Code",
+    "",
+    "\u0001IMG1\u0001",
     "",
     "[Visit](https://github.com/stinoooo/rosa-vscode)"
    ]
