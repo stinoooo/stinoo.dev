@@ -276,7 +276,16 @@
       "long": "Drop in an archive and it is unpacked and shown in the browser. Files never leave your device.",
       "githubRepo": "stinoooo/ArcUnzip",
       "more": true,
-      "shots": [],
+      "shots": [
+        {
+          "file": "shots/arcunzip.webp",
+          "alt": "ArcUnzip with arcnode-demo.zip open: its folders on the left and manifest.json shown as a JSON tree on the right"
+        },
+        {
+          "file": "shots/arcunzip-2.webp",
+          "alt": "ArcUnzip before a ZIP is opened, with the Open ZIP button and a search field for files and text"
+        }
+      ],
       "stack": [
         "TypeScript",
         "Next.js"
@@ -296,7 +305,16 @@
       "long": "Colors, file icons and a small pixel dinosaur for the Rosa Wildlife Reserve team, in one VS Code extension.",
       "githubRepo": "stinoooo/rosa-vscode",
       "more": true,
-      "shots": [],
+      "shots": [
+        {
+          "file": "shots/rosa-vscode.webp",
+          "alt": "VS Code in the dark Rosa theme: TypeScript code, Rosa file icons and Sprout, a pixel stegosaur with food, water and love bars"
+        },
+        {
+          "file": "shots/rosa-vscode-2.webp",
+          "alt": "The same code in the light Rosa theme, with Sprout's look and pattern choices in the sidebar"
+        }
+      ],
       "stack": [
         "JavaScript",
         "VS Code"

@@ -1,7 +1,7 @@
 // Turns the product images from the Arcnode website into small WebP files in site/shots/.
 // The first image of every project is the one that explains it best at a glance (key art or the
 // screen that shows what it is for); the rest show how it works. Run after an image changes:
-//   node scripts/shots.mjs [path-to-arcnode-public-projects]
+//   node scripts/shots.mjs [path-to-arcnode-public-projects] [only these outputs…]
 import sharp from "sharp";
 import path from "node:path";
 import fs from "node:fs";
@@ -36,10 +36,17 @@ const SHOTS = {
   "arcnode-games-3.webp": { src: "arcnode-games/arcnode-games-downloading.webp" },
   "arcflux.webp": { src: "arcflux/arcflux-physics.png" },
   "arcflux-2.webp": { src: "arcflux/arcflux-tracking.png" },
+  "arcunzip.webp": { src: "arcunzip/arcunzip-extracted.png" },
+  "arcunzip-2.webp": { src: "arcunzip/arcunzip-landing.png" },
+  // rosa-vscode is not on the Arcnode website; its previews live in its own repository.
+  "rosa-vscode.webp": { src: "../../../../../rosa-vscode/images/dark.png" },
+  "rosa-vscode-2.webp": { src: "../../../../../rosa-vscode/images/light.png" },
 };
+const ONLY = process.argv.slice(3);
 
 fs.mkdirSync(OUT, { recursive: true });
 for (const [name, spec] of Object.entries(SHOTS)) {
+  if (ONLY.length && !ONLY.includes(name)) continue;
   let img = sharp(path.join(SRC, spec.src));
   const { width, height } = await img.metadata();
   if (spec.crop) {
